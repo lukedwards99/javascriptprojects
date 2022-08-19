@@ -12,10 +12,10 @@ for(let i = 0; i < 12; i++){
 
     for(let j = 0; j < 12; j++){
         const newSquare = document.createElement('div');
-        newSquare.className = "col" + (squareRed ? "red" : "");
+        newSquare.className = "col" + (squareRed ? " red" : " blue");
         squareRed = !squareRed;
         newSquare.setAttribute("data-colindex", j);
-        //newSquare.innerHTML = "O";
         newRow.appendChild(newSquare);    
     }
+    squareRed = !squareRed;
 }
