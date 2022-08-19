@@ -1,0 +1,22 @@
+
+
+.row {
+    display: flex;
+    width: 900px;
+}
+
+.col {
+    width: 8%;
+    height: 50px;
+    border-style: solid;
+    border-width: 5px 5px 0px 0px;
+    background-color: blue;
+}
+
+.col .red {
+    width: 8%;
+    height: 50px;
+    border-style: solid;
+    border-width: 5px 5px 0px 0px;
+    background-color: red;
+}
