@@ -29,38 +29,31 @@ const player = document.getElementById('PlayerElem');
 player.src = "PlayerFire.png"
 document.querySelector('[data-rowindex="11"] > [data-colindex="6"]').appendChild(player);
 
-var CurrRowIndex = 11;
-var CurrColIndex = 6;
+var PlayerRowIndex = 11;
+var PlayerColIndex = 6;
 
 function ArrowLeftEventHandler(){
-    if (CurrColIndex > 0){
-        CurrColIndex--;
+    if (PlayerColIndex > 0){
+        PlayerColIndex--;
     }
-    document.querySelector('[data-rowindex="11"] > [data-colindex="' + CurrColIndex + '"]').appendChild(player);
+    document.querySelector('[data-rowindex="11"] > [data-colindex="' + PlayerColIndex + '"]').appendChild(player);
 }
 
 function ArrowRightHandler(){
-    if (CurrColIndex < NUM_COLS - 1){
-        CurrColIndex++;
+    if (PlayerColIndex < NUM_COLS - 1){
+        PlayerColIndex++;
     }
-    document.querySelector('[data-rowindex="11"] > [data-colindex="' + CurrColIndex + '"]').appendChild(player);
+    document.querySelector('[data-rowindex="11"] > [data-colindex="' + PlayerColIndex + '"]').appendChild(player);
 }
 
-const PlayerProjectiles = new Set();
-
-// function FireBallIntervalHandler(fireball, interval){
-
-//     alert("Hello");
-
-// }
-
 const FireBalls = new Set();
+const Aliens = new Set();
 
-const QuarterSecondIntervalTick = setInterval(() => {
+function HandleFireBalls() {
 
     FireBalls.forEach(function (fb) {
         //fb: fire ball object:
-            //elem: html fireball img
+            //elem: html fireball img element
             //row: row index
             //col: col index
         
@@ -74,13 +67,61 @@ const QuarterSecondIntervalTick = setInterval(() => {
             return;
         }
 
+        Aliens.forEach(function (alien) {
+            if(alien.row == fb.row && alien.col == fb.col){
+                alert("before remove");
+                fb.elem.remove();
+                fb.elem = null;
+                alien.elem.remove();
+                Aliens.delete(alien);
+                FireBalls.delete(fb);
+                alert("after remove");
+            }
+        });
+
+        if(fb.elem === null){
+            return;
+        }
+
         document.querySelector('[data-rowindex="' + fb.row + '"] > [data-colindex="' + fb.col + '"]').appendChild(fb.elem);
         fb.row--;
     });
 
+}
+
+function HandleAliens() {
+
+    Aliens.forEach(function (alien){
+        //alien: alien object
+            //elem: html fireball img element
+            //row: row index
+            //col: col index
+        if(alien.elem == null || alien.row == null || alien.col == null){ //if any fields are empty dont update the object
+            return;
+        }
+
+        if(alien.row > 11){
+            alien.elem.remove();
+            Aliens.delete(alien);
+            return;
+        }
+
+        if(alien.row == PlayerRowIndex && alien.col == PlayerColIndex){
+            alert("GAME OVER!");
+        }
+
+        document.querySelector('[data-rowindex="' + alien.row + '"] > [data-colindex="' + alien.col + '"]').appendChild(alien.elem);
+        alien.row++;
+    });
+
+}
+
+const QuarterSecondIntervalTick = setInterval(() => {
+
+    HandleFireBalls();    
+    HandleAliens();
+
 }, 250);
-
-
 
 function SpaceEventHandler(){
 
@@ -89,8 +130,8 @@ function SpaceEventHandler(){
     fireBall.className = "gameObject";
     const fb = {
         elem: fireBall,
-        col: CurrColIndex,
-        row: CurrRowIndex - 1
+        col: PlayerColIndex,
+        row: PlayerRowIndex - 1
     }
     
     FireBalls.add(fb);
@@ -105,4 +146,14 @@ document.addEventListener('keydown', (event) => {
         case "Space": SpaceEventHandler(); break;
         default: alert(event.code);
     }
+});
+
+const alien = document.createElement("img");
+alien.src = "Alien.png";
+alien.className = "gameObject";
+
+Aliens.add({
+    elem: alien,
+    row: 0,
+    col: 5
 });

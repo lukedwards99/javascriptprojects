@@ -14,13 +14,13 @@
 
 }
 
-.red {
+/* .red {
     background-color: lightcoral;
 }
 
 .blue {
     background-color: lightcyan;
-}
+} */
 
 .gameObject {
     z-index: 2;
