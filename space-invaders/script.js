@@ -3,34 +3,14 @@
 var NUM_ROWS = 12;
 var NUM_COLS = 12;
 
-
+const FireBalls = new Set();
+const Aliens = new Set();
 const grid = document.getElementById("grid");
+let player = null; //initilized later  
 
-let squareRed = false;
 
-for(let i = 0; i < 12; i++){
-
-    const newRow = document.createElement('div');
-    newRow.className = "row";
-    newRow.setAttribute("data-rowindex", i); 
-    grid.appendChild(newRow);
-
-    for(let j = 0; j < 12; j++){
-        const newSquare = document.createElement('div');
-        newSquare.className = "col" + (squareRed ? " red" : " blue");
-        squareRed = !squareRed;
-        newSquare.setAttribute("data-colindex", j);
-        newRow.appendChild(newSquare);    
-    }
-    squareRed = !squareRed;
-}
-
-const player = document.getElementById('PlayerElem');
-player.src = "PlayerFire.png"
-document.querySelector('[data-rowindex="11"] > [data-colindex="6"]').appendChild(player);
-
-var PlayerRowIndex = 11;
-var PlayerColIndex = 6;
+let PlayerRowIndex = 11;
+let PlayerColIndex = 6;
 
 function ArrowLeftEventHandler(){
     if (PlayerColIndex > 0){
@@ -45,9 +25,6 @@ function ArrowRightHandler(){
     }
     document.querySelector('[data-rowindex="11"] > [data-colindex="' + PlayerColIndex + '"]').appendChild(player);
 }
-
-const FireBalls = new Set();
-const Aliens = new Set();
 
 function HandleFireBalls() {
 
@@ -69,13 +46,11 @@ function HandleFireBalls() {
 
         Aliens.forEach(function (alien) {
             if(alien.row == fb.row && alien.col == fb.col){
-                alert("before remove");
                 fb.elem.remove();
                 fb.elem = null;
                 alien.elem.remove();
                 Aliens.delete(alien);
                 FireBalls.delete(fb);
-                alert("after remove");
             }
         });
 
@@ -116,44 +91,91 @@ function HandleAliens() {
 
 }
 
-const QuarterSecondIntervalTick = setInterval(() => {
-
-    HandleFireBalls();    
-    HandleAliens();
-
-}, 250);
-
-function SpaceEventHandler(){
-
+function CreateFireBall(_row, _col){
     const fireBall = document.createElement("img");
     fireBall.src = "Fireball.png"
     fireBall.className = "gameObject";
-    const fb = {
+    FireBalls.add({
         elem: fireBall,
-        col: PlayerColIndex,
-        row: PlayerRowIndex - 1
-    }
-    
-    FireBalls.add(fb);
+        col: _col,
+        row: _row
+    });
+}
+
+function SpaceEventHandler(){
+    CreateFireBall(PlayerRowIndex - 1, PlayerColIndex);
+}
+
+function CreateAlien(_row, _col){
+    const alien = document.createElement("img");
+    alien.src = "Alien.png";
+    alien.className = "gameObject";
+
+    Aliens.add({
+        elem: alien,
+        row: _row,
+        col: _col
+    });
+}
+
+function InitEvents(){
+    /*** EVENTS SECTION ***/
+
+    document.addEventListener('keydown', (event) => {
+
+        switch(event.code){
+            case "ArrowLeft": ArrowLeftEventHandler(); break;
+            case "ArrowRight": ArrowRightHandler(); break;
+            case "Space": SpaceEventHandler(); break;
+            default: alert(event.code);
+        }
+    });
 
 }
 
-document.addEventListener('keydown', (event) => {
 
-    switch(event.code){
-        case "ArrowLeft": ArrowLeftEventHandler(); break;
-        case "ArrowRight": ArrowRightHandler(); break;
-        case "Space": SpaceEventHandler(); break;
-        default: alert(event.code);
+
+window.addEventListener('load', function () {
+
+    //generating board
+    let squareRed = false;
+    for(let i = 0; i < 12; i++){
+
+        const newRow = document.createElement('div');
+        newRow.className = "row";
+        newRow.setAttribute("data-rowindex", i); 
+        grid.appendChild(newRow);
+
+        for(let j = 0; j < 12; j++){
+            const newSquare = document.createElement('div');
+            newSquare.className = "col" + (squareRed ? " red" : " blue");
+            squareRed = !squareRed;
+            newSquare.setAttribute("data-colindex", j);
+            newRow.appendChild(newSquare);    
+        }
+        squareRed = !squareRed;
     }
+
+
+    //init player
+    player = document.getElementById('PlayerElem');
+    player.src = "PlayerFire.png"
+    document.querySelector('[data-rowindex="11"] > [data-colindex="6"]').appendChild(player);
+
+
+    CreateAlien(0,5);
+    CreateFireBall(4,5);
+
+
+    //initilize events
+    InitEvents();
+    
+    //main game clock at the moment
+    const QuarterSecondIntervalTick = setInterval(() => {
+        HandleFireBalls();    
+        HandleAliens();
+    }, 250);
 });
 
-const alien = document.createElement("img");
-alien.src = "Alien.png";
-alien.className = "gameObject";
 
-Aliens.add({
-    elem: alien,
-    row: 0,
-    col: 5
-});
+
