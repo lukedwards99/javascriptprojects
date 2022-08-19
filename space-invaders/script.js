@@ -1,3 +1,8 @@
+"use strict";
+
+var NUM_ROWS = 12;
+var NUM_COLS = 12;
+
 
 const grid = document.getElementById("grid");
 
@@ -19,3 +24,41 @@ for(let i = 0; i < 12; i++){
     }
     squareRed = !squareRed;
 }
+
+const player = document.getElementById('PlayerElem');
+player.src = "PlayerFire.png"
+document.querySelector('[data-rowindex="11"] > [data-colindex="6"]').appendChild(player);
+
+var CurrRowIndex = 11;
+var CurrColIndex = 6;
+
+function ArrowLeftEventHandler(){
+    if (CurrColIndex > 0){
+        CurrColIndex--;
+    }
+    document.querySelector('[data-rowindex="11"] > [data-colindex="' + CurrColIndex + '"]').appendChild(player);
+}
+
+function ArrowRightHandler(){
+    if (CurrColIndex < NUM_COLS - 1){
+        CurrColIndex++;
+    }
+    document.querySelector('[data-rowindex="11"] > [data-colindex="' + CurrColIndex + '"]').appendChild(player);
+}
+
+function SpaceEventHandler(){
+
+    
+
+}
+
+document.addEventListener('keydown', (event) => {
+    var code = event.code;
+
+    switch(event.code){
+        case "ArrowLeft": ArrowLeftEventHandler(); break;
+        case "ArrowRight": ArrowRightHandler(); break;
+        case "Space": SpaceEventHandler(); break;
+        default: alert(event.code);
+    }
+});
