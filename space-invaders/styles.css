@@ -22,7 +22,7 @@
     background-color: lightcyan;
 }
 
-.player {
+.gameObject {
     z-index: 2;
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;

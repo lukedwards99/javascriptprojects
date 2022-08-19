@@ -46,14 +46,58 @@ function ArrowRightHandler(){
     document.querySelector('[data-rowindex="11"] > [data-colindex="' + CurrColIndex + '"]').appendChild(player);
 }
 
+const PlayerProjectiles = new Set();
+
+// function FireBallIntervalHandler(fireball, interval){
+
+//     alert("Hello");
+
+// }
+
+const FireBalls = new Set();
+
+const QuarterSecondIntervalTick = setInterval(() => {
+
+    FireBalls.forEach(function (fb) {
+        //fb: fire ball object:
+            //elem: html fireball img
+            //row: row index
+            //col: col index
+        
+        if(fb.elem == null || fb.row == null || fb.col == null){ //if any fields are empty dont update the object
+            return;
+        }
+
+        if(fb.row < 0){
+            fb.elem.remove();
+            FireBalls.delete(fb);
+            return;
+        }
+
+        document.querySelector('[data-rowindex="' + fb.row + '"] > [data-colindex="' + fb.col + '"]').appendChild(fb.elem);
+        fb.row--;
+    });
+
+}, 250);
+
+
+
 function SpaceEventHandler(){
 
+    const fireBall = document.createElement("img");
+    fireBall.src = "Fireball.png"
+    fireBall.className = "gameObject";
+    const fb = {
+        elem: fireBall,
+        col: CurrColIndex,
+        row: CurrRowIndex - 1
+    }
     
+    FireBalls.add(fb);
 
 }
 
 document.addEventListener('keydown', (event) => {
-    var code = event.code;
 
     switch(event.code){
         case "ArrowLeft": ArrowLeftEventHandler(); break;
