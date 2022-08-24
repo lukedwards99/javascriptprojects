@@ -4,4 +4,4 @@ This is a collection of pure JavaScript, CSS, and HTML I am using to work on my 
 
 ## Space Intruders
 
-This is a simple spin of of space invaders and was the first game I made.
+This is a simple spin off of space invaders and was the first game I made.
