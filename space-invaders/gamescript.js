@@ -1,14 +1,15 @@
 "use strict";
 
-const NUM_ROWS = 20;
-const NUM_COLS = 12;
+const NUM_ROWS = 20; 
+const NUM_COLS = 12; //TODO: set col width
 const SPAWN_PROB = .950; 
 
 
 const FireBalls = new Set();
 const Aliens = new Set();
 const grid = document.getElementById("grid");
-let player = null; //initilized later  
+let player = null; //initilized later
+let score = 0;  
 
 
 let PlayerRowIndex = NUM_ROWS - 1;
@@ -67,6 +68,8 @@ function HandleAliens() {
         if(alien.row > NUM_ROWS - 1){
             alien.elem.remove();
             Aliens.delete(alien);
+            score--;
+            document.getElementById('Score').innerHTML = "Score: " + score;
             return;
         }
 
@@ -89,6 +92,8 @@ function DetectCollision() {
                 alien.elem.remove();
                 Aliens.delete(alien);
                 FireBalls.delete(fb);
+                score++;
+                document.getElementById('Score').innerHTML = "Score: " + score;
             }
         });
     });
@@ -112,15 +117,19 @@ function ArrowLeftEventHandler(){
     document.querySelector('[data-rowindex="' + (NUM_ROWS - 1) + '"] > [data-colindex="' + PlayerColIndex + '"]').appendChild(player);
 }
 
-function ArrowRightHandler(){
+function ArrowRightEventHandler(){
     if (PlayerColIndex < NUM_COLS - 1){
         PlayerColIndex++;
     }
     document.querySelector('[data-rowindex="' + (NUM_ROWS - 1) + '"] > [data-colindex="' + PlayerColIndex + '"]').appendChild(player);
 }
 
-function SpaceEventHandler(){
+function FireEventHandler(){
     CreateFireBall(PlayerRowIndex - 1, PlayerColIndex);
+}
+
+function PanicEventHandler(){ //TODO: Implement
+    throw 'PanicEventHandler NOT IMPEMENTED!!!';
 }
 
 function CreateAlien(_row, _col){
@@ -142,11 +151,17 @@ function InitEvents(){
 
         switch(event.code){
             case "ArrowLeft": ArrowLeftEventHandler(); break;
-            case "ArrowRight": ArrowRightHandler(); break;
-            case "Space": SpaceEventHandler(); break;
+            case "ArrowRight": ArrowRightEventHandler(); break;
+            case "ArrowUp": FireEventHandler(); break;
+            case "ArrowDown": PanicEventHandler(); break;
             //default: alert(event.code);
         }
     });
+
+    document.getElementById("leftButton").addEventListener('click', ArrowLeftEventHandler);
+    document.getElementById("rightButton").addEventListener('click', ArrowRightEventHandler);
+    document.getElementById("fireButton").addEventListener('click', FireEventHandler);
+    document.getElementById("rightButton").addEventListener('click', PanicEventHandler);
 }
 
 const AlienPatterns = [
@@ -163,7 +178,7 @@ const AlienPatterns = [
     [
     'a  a  a  a  ',
     ' a  a  a  a ',
-    '   a  a  a  a'
+    '  a  a  a  a'
     ],
     [
     'aaaaaaaaaaaa'
@@ -207,11 +222,14 @@ function SpawnAliens() {
     {
         SpawnIndex = null;
     }
-
 }
 
 /*** INITIALIZATION HAPPENS HERE!!!***/
 window.addEventListener('load', function () {
+
+    //eviroment setup
+    document.body.style.zoom = "80%";
+
 
     //generating board
     let squareRed = false;

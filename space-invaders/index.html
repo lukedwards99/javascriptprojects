@@ -9,12 +9,26 @@
 <body>
     <link rel="stylesheet" href="styles.css">
 
+    <h1>Space Intruders</h1>
     
+    <div id="gridContainer">
+        <div id="grid">
+            <div class="score" id="Score">Score: 0</div>
+        </div>
+    </div>  
+    
+    <div class="flexbox">
+        <button id="leftButton" class="left btn btn-purple"> &lt; Left</button>
+        <button id="fireButton" class="btn btn-action">FIRE /\</button>
+        <button id="panicButton" class="btn btn-action">\/ PANIC</button>
+        <button id="rightButton" class="right btn btn-purple">Right &gt; </button>
+    </div>
 
-    <div id="grid"></div>
+    <div class="flexbox">
+        <p class="text-muted">You can also use arrow keys.</p>
+    </div>
 
     <img id="PlayerElem" class="gameObject">
-
     <script src="gamescript.js"></script>
 
 </body>
