@@ -4,7 +4,7 @@ const NUM_ROWS = 20;
 const NUM_COLS = 12; //TODO: set col width
 const PROB_NOT_SPAWN = .90; //probablity that if the game is not spawn that it will not spawn in the next tick
 const TICK_INTERVAL = 100; //game ticks every quarter second
-const ALIEN_TICK_UPDATE = 1; //after how many ticks will the aliens update. 2 = every other frame. 3 = every 3rd frame etc
+const ALIEN_TICK_UPDATE = 2; //after how many ticks will the aliens update. 2 = every other frame. 3 = every 3rd frame etc
 const MAX_DIFFICULTY_SCORE = 500;
 const MAX_DIFFICULTY_SPAWN_RATE = .20;
 const MIN_DIFFICULTY_SCORE = 20;
@@ -171,7 +171,19 @@ function DeleteAlienAddScore(a){
     Aliens.delete(a);
     score++;
     document.getElementById('Score').innerHTML = "Score: " + score;
-    probablitySpawnNextTick = (score > MAX_DIFFICULTY_SCORE ? MAX_DIFFICULTY_SPAWN_RATE : ((score < MIN_DIFFICULTY_SCORE ? MIN_DIFFICULTY_SCORE : score) / MAX_DIFFICULTY_SCORE) * MAX_DIFFICULTY_SPAWN_RATE)
+    SetDifficultyProbability();
+}
+
+function SetDifficultyProbability(){
+    
+    if(score < MIN_DIFFICULTY_SCORE) {
+        probablitySpawnNextTick = MIN_DIFFICULTY_SPAWN_RATE;
+    } else if(score < MAX_DIFFICULTY_SCORE) {
+        probablitySpawnNextTick = (score / MAX_DIFFICULTY_SCORE) * MAX_DIFFICULTY_SPAWN_RATE + MIN_DIFFICULTY_SPAWN_RATE;
+    } else {
+        probablitySpawnNextTick = MAX_DIFFICULTY_SPAWN_RATE + MIN_DIFFICULTY_SPAWN_RATE;
+    }
+
     console.log(probablitySpawnNextTick);
 }
 
@@ -306,8 +318,10 @@ window.addEventListener('load', function () {
             SpawnAliens();
             HandleAliens();
             lastAlienMove = 0;
-            if(firstAlienTick) {
+            if(firstAlienTick) { //game start up call
                 probablitySpawnNextTick = MIN_DIFFICULTY_SPAWN_RATE;
+                this.alert(`WELCOME TO SPACE INTRUDERS!!!\n---------------------------------------\nYour goal is to stop as many aliens as possible and to not get hit! More aliens will come the higher your score try to get a high score!`);
+                firstAlienTick = false;
             }
         }else{
             lastAlienMove++;
