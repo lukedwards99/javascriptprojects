@@ -3,8 +3,8 @@
 const NUM_ROWS = 20; 
 const NUM_COLS = 12; //TODO: set col width
 const PROB_NOT_SPAWN = .90; //probablity that if the game is not spawn that it will not spawn in the next tick
-const TICK_INTERVAL = 250; //game ticks every quarter second
-const ALIEN_TICK_UPDATE = 2; //after how many ticks will the aliens update. 2 = every other frame. 3 = every 3rd frame etc
+const TICK_INTERVAL = 100; //game ticks every quarter second
+const ALIEN_TICK_UPDATE = 1; //after how many ticks will the aliens update. 2 = every other frame. 3 = every 3rd frame etc
 const MAX_DIFFICULTY_SCORE = 500;
 const MAX_DIFFICULTY_SPAWN_RATE = .20;
 const MIN_DIFFICULTY_SCORE = 20;
@@ -18,11 +18,11 @@ const grid = document.getElementById("grid");
 let player = null; //initilized later
 let score = 0;  
 let fireballCooldown = 0;
-const fireballCooldownStep = .5;
-const fireballCooldownReset = 2;
+const fireballCooldownStep = TICK_INTERVAL / 1000; //keeps fireball cooldown tied to seconds
+const fireballCooldownReset = .75;
 let panicCooldown = 0;
-const panicCooldownStep = .25; 
-const panicCooldownReset = 20;
+const panicCooldownStep = TICK_INTERVAL / 1000; //keeps panic cooldown tied to seconds
+const panicCooldownReset = 15;
 let probablitySpawnNextTick = 1;
 let firstAlienTick = true;
 
