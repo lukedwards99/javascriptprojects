@@ -3,6 +3,8 @@
 const NUM_ROWS = 20; 
 const NUM_COLS = 12; //TODO: set col width
 const SPAWN_PROB = .950; 
+const TICK_INTERVAL = 250; //game ticks every quarter second
+const ALIEN_TICK_UPDATE = 2; //after how many ticks will the aliens update. 2 = every other frame. 3 = every 3rd frame etc
 
 
 const FireBalls = new Set();
@@ -10,7 +12,13 @@ const Aliens = new Set();
 const grid = document.getElementById("grid");
 let player = null; //initilized later
 let score = 0;  
-
+let fireballCooldown = 0;
+const fireballCooldownStep = .5;
+const fireballCooldownReset = 2;
+let panicCooldown = 0;
+const panicCooldownStep = .25; 
+const panicCooldownReset = 15;
+let firstTick = true;
 
 let PlayerRowIndex = NUM_ROWS - 1;
 let PlayerColIndex = 6;
@@ -89,11 +97,8 @@ function DetectCollision() {
             if((alien.row == fb.row && alien.col == fb.col ) || (alien.row + 1 == fb.row && alien.col == fb.col )){ //TODO: make this more robust
                 fb.elem.remove();
                 fb.elem = null;
-                alien.elem.remove();
-                Aliens.delete(alien);
                 FireBalls.delete(fb);
-                score++;
-                document.getElementById('Score').innerHTML = "Score: " + score;
+                DeleteAlienAddScore(alien);
             }
         });
     });
@@ -124,12 +129,41 @@ function ArrowRightEventHandler(){
     document.querySelector('[data-rowindex="' + (NUM_ROWS - 1) + '"] > [data-colindex="' + PlayerColIndex + '"]').appendChild(player);
 }
 
+
+
+
 function FireEventHandler(){
+    if (fireballCooldown > 0){
+        return;
+    }
+
     CreateFireBall(PlayerRowIndex - 1, PlayerColIndex);
+    fireballCooldown = fireballCooldownReset;
 }
 
 function PanicEventHandler(){ //TODO: Implement
-    throw 'PanicEventHandler NOT IMPEMENTED!!!';
+    if(panicCooldown > 0){
+        return;
+    }
+
+    Aliens.forEach(function (a) {
+        if(a.row == NUM_ROWS - 1 || a.row == NUM_ROWS - 2){
+            DeleteAlienAddScore(a);
+        }
+    });
+
+    for(let i = 0; i < NUM_COLS; i++){
+        CreateFireBall(NUM_ROWS - 1, i);
+        CreateFireBall(NUM_ROWS - 2, i);
+    }
+    panicCooldown = panicCooldownReset;
+}
+
+function DeleteAlienAddScore(a){
+    a.elem.remove();
+    Aliens.delete(a);
+    score++;
+    document.getElementById('Score').innerHTML = "Score: " + score;
 }
 
 function CreateAlien(_row, _col){
@@ -142,6 +176,31 @@ function CreateAlien(_row, _col){
         row: _row,
         col: _col
     });
+}
+
+function HandlePlayerStatusBars(){
+
+    //Fire progress bar
+    let firebar = document.getElementById("fireballProgressBar");
+    console.log(fireballCooldown);
+    if(fireballCooldown <= 0){
+        firebar.style.width = "100%";
+    }else{
+    let fireBarInverseWidth = fireballCooldown / fireballCooldownReset;
+    firebar.style.width = (100 - fireBarInverseWidth * 100) + "%";
+    fireballCooldown -= fireballCooldownStep;
+    }
+    //Panic progess bar
+    let panicbar = document.getElementById("panicProgressBar");
+    //debugger;
+    console.log(panicbar);
+    if(panicCooldown <= 0){
+        panicbar.style.width = "100%";
+    }else{
+    let panicBarInverseWidth = panicCooldown / panicCooldownReset;
+    panicbar.style.width = (100 - panicBarInverseWidth * 100) + "%";
+    panicCooldown -= panicCooldownStep;
+    }
 }
 
 function InitEvents(){
@@ -161,7 +220,7 @@ function InitEvents(){
     document.getElementById("leftButton").addEventListener('click', ArrowLeftEventHandler);
     document.getElementById("rightButton").addEventListener('click', ArrowRightEventHandler);
     document.getElementById("fireButton").addEventListener('click', FireEventHandler);
-    document.getElementById("rightButton").addEventListener('click', PanicEventHandler);
+    document.getElementById("panicButton").addEventListener('click', PanicEventHandler);
 }
 
 const AlienPatterns = [
@@ -199,11 +258,11 @@ let SpawnIndex = null; //spawn index is used to keep track of where in the spawn
 let SpawnPattern = null;
 function SpawnAliens() {
 
-    if(Math.random() > SPAWN_PROB && SpawnIndex === null) { // start new spawn
+    if((Math.random() > SPAWN_PROB || firstTick)&& SpawnIndex === null) { // start new spawn
         SpawnIndex = 0;
         SpawnPattern = Math.floor(Math.random() * AlienPatterns.length);
     }
-
+    firstTick = false;
     if(SpawnIndex === null) { //no spawning this cycle
         return;
     }
@@ -229,7 +288,6 @@ window.addEventListener('load', function () {
 
     //eviroment setup
     document.body.style.zoom = "80%";
-
 
     //generating board
     let squareRed = false;
@@ -268,16 +326,20 @@ window.addEventListener('load', function () {
     let lastAlienMove = 0;
     let lastFireballMove = 0;
     const QuarterSecondIntervalTick = setInterval(() => {
-        if(lastAlienMove > 2) {
+
+        if(lastAlienMove > ALIEN_TICK_UPDATE) { //aliens only move every 2 ticks
             HandleAliens();
             SpawnAliens();
             lastAlienMove = 0;
         }else{
             lastAlienMove++;
         }
+
         HandleFireBalls();  
         DetectCollision();
-    }, 250);
+        HandlePlayerStatusBars();
+        
+    }, TICK_INTERVAL);
 
     // const SecondIntervalTick = this.setInterval(() => {
     //     const col = Math.floor(Math.random() * NUM_COLS);

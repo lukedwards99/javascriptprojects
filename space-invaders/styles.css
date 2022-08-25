@@ -114,3 +114,16 @@ h1 {
     font-style: italic;
     color: #4e0057;
 }
+
+.progress {
+    width: 900px;
+    background-color: #b64300;
+    border-radius: 10px;
+  }
+  
+ .progressBar {
+    width: 100%;
+    height: 30px;
+    background-color: #e69d00;
+    border-radius: 10px;
+  }
