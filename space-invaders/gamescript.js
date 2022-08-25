@@ -22,7 +22,7 @@ const fireballCooldownStep = .5;
 const fireballCooldownReset = 2;
 let panicCooldown = 0;
 const panicCooldownStep = .25; 
-const panicCooldownReset = 15;
+const panicCooldownReset = 20;
 let probablitySpawnNextTick = 1;
 let firstAlienTick = true;
 
@@ -229,37 +229,6 @@ function InitEvents(){
     document.getElementById("panicButton").addEventListener('click', PanicEventHandler);
 }
 
-const AlienPatterns = [
-    [
-    'aaaaaaaaaaaa',
-    'aaa   aaa   ',
-    '   aaa   aaa'
-    ],
-    [
-    'a a   a  a  ',
-    '    a     a ',
-    ' a     a    '
-    ],
-    [
-    'a  a  a  a  ',
-    ' a  a  a  a ',
-    '  a  a  a  a'
-    ],
-    [
-    'aaaaaaaaaaaa'
-    ]
-    // [
-    // 'aaaaaaaaaaaa',
-    // 'aaa   aaa   ',
-    // '   aaa   aaa'
-    // ],
-    // [
-    // 'aaaaaaaaaaaa',
-    // 'aaa   aaa   ',
-    // '   aaa   aaa'
-    // ],
-];
-
 let SpawnIndex = null; //spawn index is used to keep track of where in the spawning cycle I am at.
 let SpawnPattern = null;
 function SpawnAliens() {
@@ -352,3 +321,49 @@ window.addEventListener('load', function () {
         
     }, TICK_INTERVAL);
 });
+
+
+const AlienPatterns = [
+    [
+        'aaaaaaaaaaaa',
+        'aaa   aaa   ',
+        '   aaa   aaa'
+    ],
+    [
+        'a     a  a  ',
+        '    a     a ',
+        ' a     a    '
+    ],
+    [
+        'a  a  a  a  ',
+        ' a  a  a  a ',
+        '  a  a  a  a'
+    ],
+    [
+        'aaaaaaaaaaaa'
+    ],
+    [
+        '    aaa     ',
+        '  a     a   ',
+        ' a       a  ',
+        '  a     a   ',
+        '    aaa     '
+    ],
+    [
+        '     aa     ',
+        '    a  a    ',
+        '   a    a   ',
+        '  a      a  ',
+        ' a        a ',
+        'a          a'
+    ],
+    [
+        '  a         ',
+        '    a  a    ',
+        '   a        ',
+        '            ',
+        '     a    a ',
+        'a           '
+    ]
+    
+];
