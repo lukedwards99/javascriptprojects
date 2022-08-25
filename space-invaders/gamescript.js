@@ -2,9 +2,14 @@
 
 const NUM_ROWS = 20; 
 const NUM_COLS = 12; //TODO: set col width
-const SPAWN_PROB = .950; 
+const PROB_NOT_SPAWN = .90; //probablity that if the game is not spawn that it will not spawn in the next tick
 const TICK_INTERVAL = 250; //game ticks every quarter second
 const ALIEN_TICK_UPDATE = 2; //after how many ticks will the aliens update. 2 = every other frame. 3 = every 3rd frame etc
+const MAX_DIFFICULTY_SCORE = 500;
+const MAX_DIFFICULTY_SPAWN_RATE = .20;
+const MIN_DIFFICULTY_SCORE = 20;
+const MIN_DIFFICULTY_SPAWN_RATE = .10;
+
 
 
 const FireBalls = new Set();
@@ -18,7 +23,8 @@ const fireballCooldownReset = 2;
 let panicCooldown = 0;
 const panicCooldownStep = .25; 
 const panicCooldownReset = 15;
-let firstTick = true;
+let probablitySpawnNextTick = 1;
+let firstAlienTick = true;
 
 let PlayerRowIndex = NUM_ROWS - 1;
 let PlayerColIndex = 6;
@@ -81,8 +87,9 @@ function HandleAliens() {
             return;
         }
 
-        if(alien.row == PlayerRowIndex && alien.col == PlayerColIndex){
-            //alert("GAME OVER!");
+        if(alien.row == PlayerRowIndex && alien.col == PlayerColIndex){ //alien intersect with player
+            alert("GAME OVER!");
+            location.reload();
         }
 
         //debugger;
@@ -164,6 +171,8 @@ function DeleteAlienAddScore(a){
     Aliens.delete(a);
     score++;
     document.getElementById('Score').innerHTML = "Score: " + score;
+    probablitySpawnNextTick = (score > MAX_DIFFICULTY_SCORE ? MAX_DIFFICULTY_SPAWN_RATE : ((score < MIN_DIFFICULTY_SCORE ? MIN_DIFFICULTY_SCORE : score) / MAX_DIFFICULTY_SCORE) * MAX_DIFFICULTY_SPAWN_RATE)
+    console.log(probablitySpawnNextTick);
 }
 
 function CreateAlien(_row, _col){
@@ -182,7 +191,6 @@ function HandlePlayerStatusBars(){
 
     //Fire progress bar
     let firebar = document.getElementById("fireballProgressBar");
-    console.log(fireballCooldown);
     if(fireballCooldown <= 0){
         firebar.style.width = "100%";
     }else{
@@ -192,8 +200,6 @@ function HandlePlayerStatusBars(){
     }
     //Panic progess bar
     let panicbar = document.getElementById("panicProgressBar");
-    //debugger;
-    console.log(panicbar);
     if(panicCooldown <= 0){
         panicbar.style.width = "100%";
     }else{
@@ -258,11 +264,11 @@ let SpawnIndex = null; //spawn index is used to keep track of where in the spawn
 let SpawnPattern = null;
 function SpawnAliens() {
 
-    if((Math.random() > SPAWN_PROB || firstTick)&& SpawnIndex === null) { // start new spawn
+    if( Math.random() <= probablitySpawnNextTick && SpawnIndex === null) { // start new spawn
         SpawnIndex = 0;
         SpawnPattern = Math.floor(Math.random() * AlienPatterns.length);
     }
-    firstTick = false;
+
     if(SpawnIndex === null) { //no spawning this cycle
         return;
     }
@@ -322,15 +328,18 @@ window.addEventListener('load', function () {
     //initilize events
     InitEvents();
     
-    //main game clock at the moment
+    //main game clock 
     let lastAlienMove = 0;
-    let lastFireballMove = 0;
+    //let lastFireballMove = 0;
     const QuarterSecondIntervalTick = setInterval(() => {
 
         if(lastAlienMove > ALIEN_TICK_UPDATE) { //aliens only move every 2 ticks
-            HandleAliens();
             SpawnAliens();
+            HandleAliens();
             lastAlienMove = 0;
+            if(firstAlienTick) {
+                probablitySpawnNextTick = MIN_DIFFICULTY_SPAWN_RATE;
+            }
         }else{
             lastAlienMove++;
         }
@@ -338,12 +347,8 @@ window.addEventListener('load', function () {
         HandleFireBalls();  
         DetectCollision();
         HandlePlayerStatusBars();
+
+        
         
     }, TICK_INTERVAL);
-
-    // const SecondIntervalTick = this.setInterval(() => {
-    //     const col = Math.floor(Math.random() * NUM_COLS);
-    //     CreateAlien(0, col);
-    //     //debugger;
-    // },1000);
 });

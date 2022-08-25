@@ -76,7 +76,7 @@ h1 {
     border-style: solid;
     padding: 10px;
     border-radius: 10px;
-    border-width: 3px;
+    border-width: 4px;
     margin:10px;
     width: 150px;
     height: 50px;
@@ -105,7 +105,16 @@ h1 {
 
 .btn-action:hover {
     background-color: #e65400;
-    
+}
+
+.btn-panic {
+    color: #000000;
+    background-color: #c40000;
+    border-color: #8a0000;
+}
+
+.btn-panic:hover {
+    background-color: #8a0000;
 }
 
 .text-muted {
@@ -115,15 +124,29 @@ h1 {
     color: #4e0057;
 }
 
-.progress {
+#fireballProgress {
     width: 900px;
-    background-color: #b64300;
+    background-color: #6e2800;
     border-radius: 10px;
-  }
+}
   
- .progressBar {
+#fireballProgressBar {
     width: 100%;
     height: 30px;
     background-color: #e69d00;
     border-radius: 10px;
-  }
+}
+
+#panicProgress {
+    width: 900px;
+    background-color: #360000;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+#panicProgressBar {
+    width: 100%;
+    height: 30px;
+    background-color: #c40000;
+    border-radius: 10px;
+}
