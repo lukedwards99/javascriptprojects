@@ -8,6 +8,6 @@ The projects are hosted here: https://students.cs.niu.edu/~z1861935/javascriptpr
 
 This is a simple spin off of space invaders and was the first game I made.
 
-# TODO:
+### TODO:
 
 1. Add power up that gives the second row of the panic attack
