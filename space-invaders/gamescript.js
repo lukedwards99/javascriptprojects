@@ -14,6 +14,7 @@ const MIN_DIFFICULTY_SPAWN_RATE = .10;
 
 const FireBalls = new Set();
 const Aliens = new Set();
+const PowerUps = new Set();
 const grid = document.getElementById("grid");
 let player = null; //initilized later
 let score = 0;  
@@ -80,16 +81,13 @@ function HandleAliens() {
         alien.row++;
 
         if(alien.row > NUM_ROWS - 1){
-            alien.elem.remove();
-            Aliens.delete(alien);
-            score--;
-            document.getElementById('Score').innerHTML = "Score: " + score;
+            DeleteAlienAddScore(alien);
             return;
         }
 
         if(alien.row == PlayerRowIndex && alien.col == PlayerColIndex){ //alien intersect with player
-            alert("GAME OVER!");
-            location.reload();
+            //alert("GAME OVER!");
+            //location.reload();
         }
 
         //debugger;
@@ -184,10 +182,11 @@ function SetDifficultyProbability(){
         probablitySpawnNextTick = MAX_DIFFICULTY_SPAWN_RATE + MIN_DIFFICULTY_SPAWN_RATE;
     }
 
-    console.log(probablitySpawnNextTick);
+    //console.log(probablitySpawnNextTick);
 }
 
-function CreateAlien(_row, _col){
+function CreateAlien(_row, _col){// note that once update method is called the first frame that it is displayed
+    //will be one row lower than _row value passed. Pass -1 to have show in row 0 on first frame update.
     const alien = document.createElement("img");
     alien.src = "Alien.png";
     alien.className = "gameObject";
@@ -206,18 +205,18 @@ function HandlePlayerStatusBars(){
     if(fireballCooldown <= 0){
         firebar.style.width = "100%";
     }else{
-    let fireBarInverseWidth = fireballCooldown / fireballCooldownReset;
-    firebar.style.width = (100 - fireBarInverseWidth * 100) + "%";
-    fireballCooldown -= fireballCooldownStep;
+        let fireBarInverseWidth = fireballCooldown / fireballCooldownReset;
+        firebar.style.width = (100 - fireBarInverseWidth * 100) + "%";
+        fireballCooldown -= fireballCooldownStep;
     }
-    //Panic progess bar
-    let panicbar = document.getElementById("panicProgressBar");
-    if(panicCooldown <= 0){
-        panicbar.style.width = "100%";
+        //Panic progess bar
+        let panicbar = document.getElementById("panicProgressBar");
+        if(panicCooldown <= 0){
+            panicbar.style.width = "100%";
     }else{
-    let panicBarInverseWidth = panicCooldown / panicCooldownReset;
-    panicbar.style.width = (100 - panicBarInverseWidth * 100) + "%";
-    panicCooldown -= panicCooldownStep;
+        let panicBarInverseWidth = panicCooldown / panicCooldownReset;
+        panicbar.style.width = (100 - panicBarInverseWidth * 100) + "%";
+        panicCooldown -= panicCooldownStep;
     }
 }
 
@@ -257,7 +256,7 @@ function SpawnAliens() {
     for(let i = 0; i < AlienPatterns[SpawnPattern][SpawnIndex].length; i++){
 
         if(AlienPatterns[SpawnPattern][SpawnIndex].charAt(i) === 'a'){
-            CreateAlien(0, i);
+            CreateAlien(-1, i);
         }
 
     }
@@ -268,6 +267,62 @@ function SpawnAliens() {
     {
         SpawnIndex = null;
     }
+}
+
+function HandlePowerUps() {
+
+    PowerUps.forEach( function(pu) {
+
+        if(pu.elem == null || pu.row == null || pu.col == null){ //if any fields are empty dont update the object and delete it
+            try {
+                pu.elem.remove();
+                PowerUps.delete(pu);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                return;
+            }
+        }
+        
+        pu.row++;
+
+        if(pu.row > NUM_ROWS - 1){
+            pu.elem.remove();
+            PowerUps.delete(pu);
+            return;
+        }
+
+        if(pu.row == PlayerRowIndex && pu.col == PlayerColIndex){ //alien intersect with player
+            alert("POWER UP!!!");
+        }
+
+        //debugger;
+        document.querySelector('[data-rowindex="' + pu.row + '"] > [data-colindex="' + pu.col + '"]').appendChild(pu.elem);
+    
+        
+    });
+
+}
+
+function CreatePowerUp(_row, _col) { // note that once update method is called the first frame that it is displayed
+    //will be one row lower than _row value passed. Pass -1 to have show in row 0 on first frame update.
+    const powerUp = document.createElement("img");
+    powerUp.src = "PowerUp.png";
+    powerUp.className = "gameObject";
+
+    PowerUps.add({
+        elem: powerUp,
+        row: _row,
+        col: _col
+    });
+
+}
+
+function SpawnPowerUps() {
+
+    const spawnCol = Math.floor(Math.random() * NUM_COLS)
+    CreatePowerUp(-1, );
+
 }
 
 /*** INITIALIZATION HAPPENS HERE!!!***/
@@ -317,6 +372,8 @@ window.addEventListener('load', function () {
         if(lastAlienMove > ALIEN_TICK_UPDATE) { //aliens only move every 2 ticks
             SpawnAliens();
             HandleAliens();
+            SpawnPowerUps();
+            HandlePowerUps();
             lastAlienMove = 0;
             if(firstAlienTick) { //game start up call
                 probablitySpawnNextTick = MIN_DIFFICULTY_SPAWN_RATE;

@@ -9,3 +9,5 @@ This is a simple spin off of space invaders and was the first game I made.
 # TODO:
 
 1. Add power up that gives the second row of the panic attack
+
+2. Add a timer
