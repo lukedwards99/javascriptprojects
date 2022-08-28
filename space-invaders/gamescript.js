@@ -9,6 +9,7 @@ const MAX_DIFFICULTY_SCORE = 500;
 const MAX_DIFFICULTY_SPAWN_RATE = .20;
 const MIN_DIFFICULTY_SCORE = 20;
 const MIN_DIFFICULTY_SPAWN_RATE = .10;
+const POWER_UP_PROB = .25;
 
 
 
@@ -20,12 +21,13 @@ let player = null; //initilized later
 let score = 0;  
 let fireballCooldown = 0;
 const fireballCooldownStep = TICK_INTERVAL / 1000; //keeps fireball cooldown tied to seconds
-const fireballCooldownReset = .75;
+const fireballCooldownReset = .5;
 let panicCooldown = 0;
 const panicCooldownStep = TICK_INTERVAL / 1000; //keeps panic cooldown tied to seconds
-const panicCooldownReset = 15;
+const panicCooldownReset = 10;
 let probablitySpawnNextTick = 1;
 let firstAlienTick = true;
+let playerHasPowerup = false;
 
 let PlayerRowIndex = NUM_ROWS - 1;
 let PlayerColIndex = 6;
@@ -81,13 +83,16 @@ function HandleAliens() {
         alien.row++;
 
         if(alien.row > NUM_ROWS - 1){
-            DeleteAlienAddScore(alien);
+            alien.elem.remove();
+            Aliens.delete(alien);
+            score--;
+            document.getElementById('Score').innerHTML = "Score: " + score;
             return;
         }
 
         if(alien.row == PlayerRowIndex && alien.col == PlayerColIndex){ //alien intersect with player
-            //alert("GAME OVER!");
-            //location.reload();
+            alert("GAME OVER!");
+            location.reload();
         }
 
         //debugger;
@@ -96,14 +101,25 @@ function HandleAliens() {
 }
 
 function DetectCollision() {
-    Aliens.forEach(function (alien) {
+    FireBalls.forEach(function (fb) {
         //console.log("Checking alien at row: " + alien.row + " col: " + alien.col + "\n" + "fireball at row: " + fb.row + " col: " + fb.col);
-        FireBalls.forEach(function (fb) {
+        Aliens.forEach(function (alien) {
             if((alien.row == fb.row && alien.col == fb.col ) || (alien.row + 1 == fb.row && alien.col == fb.col )){ //TODO: make this more robust
                 fb.elem.remove();
                 fb.elem = null;
                 FireBalls.delete(fb);
                 DeleteAlienAddScore(alien);
+            }
+        });
+
+        PowerUps.forEach(function (pu) {
+            if((pu.row == fb.row && pu.col == fb.col ) || (pu.row + 1 == fb.row && pu.col == fb.col )){
+                fb.elem.remove();
+                fb.elem = null;
+                FireBalls.delete(fb);
+                pu.elem.remove();
+                pu.elem = null;
+                PowerUps.delete(pu);
             }
         });
     });
@@ -159,9 +175,13 @@ function PanicEventHandler(){ //TODO: Implement
 
     for(let i = 0; i < NUM_COLS; i++){
         CreateFireBall(NUM_ROWS - 1, i);
-        CreateFireBall(NUM_ROWS - 2, i);
+        if(playerHasPowerup){
+            CreateFireBall(NUM_ROWS - 2, i);
+        }
     }
+
     panicCooldown = panicCooldownReset;
+    playerHasPowerup = false;
 }
 
 function DeleteAlienAddScore(a){
@@ -209,14 +229,21 @@ function HandlePlayerStatusBars(){
         firebar.style.width = (100 - fireBarInverseWidth * 100) + "%";
         fireballCooldown -= fireballCooldownStep;
     }
-        //Panic progess bar
-        let panicbar = document.getElementById("panicProgressBar");
-        if(panicCooldown <= 0){
+
+    //Panic progess bar
+    let panicbar = document.getElementById("panicProgressBar");
+    if(panicCooldown <= 0){
             panicbar.style.width = "100%";
     }else{
         let panicBarInverseWidth = panicCooldown / panicCooldownReset;
         panicbar.style.width = (100 - panicBarInverseWidth * 100) + "%";
         panicCooldown -= panicCooldownStep;
+    }
+
+    if(playerHasPowerup){
+        panicbar.style.backgroundColor = "#00c403";
+    } else {
+        panicbar.style.backgroundColor = "#c40000" 
     }
 }
 
@@ -240,9 +267,11 @@ function InitEvents(){
     document.getElementById("panicButton").addEventListener('click', PanicEventHandler);
 }
 
+
+//Handles spawning of all elements by reading the alien spawn array at the end of the script
 let SpawnIndex = null; //spawn index is used to keep track of where in the spawning cycle I am at.
 let SpawnPattern = null;
-function SpawnAliens() {
+function Spawn() {
 
     if( Math.random() <= probablitySpawnNextTick && SpawnIndex === null) { // start new spawn
         SpawnIndex = 0;
@@ -257,6 +286,13 @@ function SpawnAliens() {
 
         if(AlienPatterns[SpawnPattern][SpawnIndex].charAt(i) === 'a'){
             CreateAlien(-1, i);
+        }
+        if(AlienPatterns[SpawnPattern][SpawnIndex].charAt(i) === 'p'){
+            if(Math.random() < POWER_UP_PROB){
+                CreatePowerUp(-1, i);
+            }else{
+                CreateAlien(-1, i);
+            }
         }
 
     }
@@ -293,7 +329,11 @@ function HandlePowerUps() {
         }
 
         if(pu.row == PlayerRowIndex && pu.col == PlayerColIndex){ //alien intersect with player
-            alert("POWER UP!!!");
+            playerHasPowerup = true;
+            panicCooldown = 0;
+            pu.elem.remove();
+            PowerUps.delete(pu);
+            return;
         }
 
         //debugger;
@@ -370,9 +410,9 @@ window.addEventListener('load', function () {
     const QuarterSecondIntervalTick = setInterval(() => {
 
         if(lastAlienMove > ALIEN_TICK_UPDATE) { //aliens only move every 2 ticks
-            SpawnAliens();
+            Spawn();
             HandleAliens();
-            SpawnPowerUps();
+            //SpawnPowerUps();
             HandlePowerUps();
             lastAlienMove = 0;
             if(firstAlienTick) { //game start up call
@@ -396,45 +436,61 @@ window.addEventListener('load', function () {
 
 const AlienPatterns = [
     [
-        'aaaaaaaaaaaa',
-        'aaa   aaa   ',
+        'aaaaaaapaaaa',
+        'aaa p aaa   ',
         '   aaa   aaa'
     ],
     [
-        'a     a  a  ',
+        'a  p  a  a  ',
         '    a     a ',
         ' a     a    '
     ],
     [
-        'a  a  a  a  ',
-        ' a  a  a  a ',
+        'p  a  a  a  ',
+        ' a  a  p  a ',
         '  a  a  a  a'
     ],
     [
-        'aaaaaaaaaaaa'
+        'apaaaapaaaaa'
     ],
     [
-        '    aaa     ',
+        '    apa     ',
         '  a     a   ',
-        ' a       a  ',
+        ' a   p   a  ',
         '  a     a   ',
-        '    aaa     '
+        '    apa     '
     ],
     [
         '     aa     ',
         '    a  a    ',
         '   a    a   ',
         '  a      a  ',
-        ' a        a ',
+        ' a   p    a ',
         'a          a'
     ],
     [
-        '  a         ',
+        '  p         ',
         '    a  a    ',
         '   a        ',
-        '            ',
+        '        p   ',
         '     a    a ',
         'a           '
+    ],
+    [
+        '  p     a    ',
+        '             ',
+        '   a         ',
+        '             ',
+        '  a   a    a ',
+        '      p      '
+    ],
+    [
+        '  a      a  ',
+        '    a  a    ',
+        '   p        ',
+        '            ',
+        '        a   ',
+        'a        p  '
     ]
     
 ];
