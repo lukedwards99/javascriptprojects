@@ -7,14 +7,21 @@ const MAX_SPEED = 5; //max speed of player (pixels per frame)
 const PLAYER_ACCELERATION = .5 //acceleration of player
 const TURN_SPEED = 5;
 const PROJ_SPEED = 10; //speed of projectiles (px/frame)
+const ASTROID_SPEED = 4;
+const ASTROID_RADIUS = 10;
+const MIN_ASTROID_SPAWN_COOLDOWN = 10; //in frames
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+let frameNumber = 0;
+let spawnAstroidEvery = 60; //how many frames pass before the next astroid is spawned 
 
 let upPressed = false;
 let downPressed = false;
 
 const Projectiles = new Set();
+const Astroids = new Set();
 
 let player = { //player object
     x: canvas.width / 2,
@@ -51,9 +58,9 @@ function UpdatePlayerPos(){
 }
 
 function UpdatePhysics() {
-
     UpdatePlayerPos();
     UpdateProjectilePos();
+    UpdateAstroidPos();
 }
 
 function UpdateProjectilePos(){
@@ -79,12 +86,30 @@ function DrawProjectiles(){
     });
 }
 
+function DrawAstroids(){
+    Astroids.forEach(function (ast) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(ast.x, ast.y, ast.radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#FFFFFF";
+        ctx.stroke();
+        ctx.restore();  
+    });
+}
+
+function UpdateAstroidPos(){
+    Astroids.forEach(function (ast) {
+        ast.x += ASTROID_SPEED * Math.sin(ast.angle);
+        ast.y -= ASTROID_SPEED * Math.cos(ast.angle);
+    });
+}
+
 function Draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height); //clear canvas to redraw
 
     DrawPlayer();
     DrawProjectiles();
-
+    DrawAstroids();
 }
 
 function DrawPlayer() {
@@ -99,6 +124,22 @@ function DrawPlayer() {
     ctx.strokeStyle = "#FFFFFF";
     ctx.stroke();
     ctx.restore();  
+}
+
+function SpawnAstroid(){
+
+    CreateAstroid(Math.floor(Math.random() * canvas.width), Math.floor(Math.random() * canvas.height), Math.floor(Math.random() * Math.PI * 2));
+
+}
+
+function CreateAstroid(_x, _y, _angle){
+    Astroids.add({
+        x: _x,
+        y: _y,
+        speed: ASTROID_SPEED,
+        angle: _angle,
+        radius: ASTROID_RADIUS
+    });
 }
 
 function InitEvents() {
@@ -135,11 +176,19 @@ function Fire(){
     Projectiles.add(projectile);
 }
 
-
 //actual initilization
-
 InitEvents();
 const FrameUpdate = setInterval(function () { 
+    frameNumber++;
+
+    if(frameNumber % spawnAstroidEvery == 0){
+        SpawnAstroid();
+        //console.log("spawn astroid");
+
+        if(spawnAstroidEvery > MIN_ASTROID_SPAWN_COOLDOWN){
+            spawnAstroidEvery--;
+        }
+    }
 
     UpdatePhysics();
     Draw(); 
