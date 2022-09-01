@@ -1,7 +1,5 @@
 "use strict";
 
-//const WIDTH = 900;
-//const HEIGHT = 600;
 const FPS = 30;
 const MAX_SPEED = 5; //max speed of player (pixels per frame)
 const PLAYER_ACCELERATION = .5 //acceleration of player
@@ -9,6 +7,7 @@ const TURN_SPEED = 5;
 const PROJ_SPEED = 10; //speed of projectiles (px/frame)
 const ASTROID_SPEED = 4;
 const ASTROID_RADIUS = 10;
+const PLAYER_RADIUS = 10;
 const MIN_ASTROID_SPAWN_COOLDOWN = 10; //in frames
 
 const canvas = document.getElementById("gameCanvas");
@@ -17,6 +16,7 @@ const ctx = canvas.getContext("2d");
 let frameNumber = 0;
 let spawnAstroidEvery = 60; //how many frames pass before the next astroid is spawned 
 let score = 0;
+let gameOver = false;
 
 let upPressed = false;
 let downPressed = false;
@@ -121,6 +121,13 @@ function UpdateAstroidPos(){
             return;
         }
 
+        const distanceFromPlayer = Math.sqrt(Math.pow(ast.x - player.x, 2) + Math.pow(ast.y - player.y, 2));
+        if((distanceFromPlayer < ast.radius + PLAYER_RADIUS) && gameOver === false){
+            gameOver = true
+            alert("Game Over!");
+            location.reload();
+        }
+
     });
 }
 
@@ -137,13 +144,22 @@ function DrawPlayer() {
     ctx.translate(player.x, player.y);
     ctx.rotate(player.angle);
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(10, 20);
-    ctx.lineTo( -10, 20);
-    ctx.lineTo(0, 0);
+    ctx.moveTo(0, -PLAYER_RADIUS);
+    ctx.lineTo(PLAYER_RADIUS, PLAYER_RADIUS);
+    ctx.lineTo(-PLAYER_RADIUS, PLAYER_RADIUS);
+    ctx.lineTo(0, -PLAYER_RADIUS);
     ctx.strokeStyle = "#FFFFFF";
     ctx.stroke();
     ctx.restore();  
+
+    //will draw the hitbox of the player
+    // ctx.save();
+    // ctx.translate(player.x, player.y);
+    // ctx.beginPath();
+    // ctx.arc(0, 0, PLAYER_RADIUS, 0, 2 * Math.PI);
+    // ctx.strokeStyle = "#FFFFFF";
+    // ctx.stroke();
+    // ctx.restore();  
 }
 
 function SpawnAstroid(){
