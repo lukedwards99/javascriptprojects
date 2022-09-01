@@ -16,6 +16,7 @@ const ctx = canvas.getContext("2d");
 
 let frameNumber = 0;
 let spawnAstroidEvery = 60; //how many frames pass before the next astroid is spawned 
+let score = 0;
 
 let upPressed = false;
 let downPressed = false;
@@ -97,10 +98,29 @@ function DrawAstroids(){
     });
 }
 
+//collisions are all handled by the astroid updateds
 function UpdateAstroidPos(){
     Astroids.forEach(function (ast) {
         ast.x += ASTROID_SPEED * Math.sin(ast.angle);
         ast.y -= ASTROID_SPEED * Math.cos(ast.angle);
+
+        let hit = false;
+
+        //collision detection with projectiles
+        Projectiles.forEach(function (proj) {
+            const distance = Math.sqrt(Math.pow(ast.x - proj.x, 2) + Math.pow(ast.y - proj.y, 2));
+            if(distance < ast.radius){ 
+                Projectiles.delete(proj);
+                Astroids.delete(ast);
+
+                hit = true;
+            }
+        });
+
+        if(hit === true){
+            return;
+        }
+
     });
 }
 
@@ -186,7 +206,7 @@ const FrameUpdate = setInterval(function () {
         //console.log("spawn astroid");
 
         if(spawnAstroidEvery > MIN_ASTROID_SPAWN_COOLDOWN){
-            spawnAstroidEvery--;
+            spawnAstroidEvery--; //TODO: tweak this logic
         }
     }
 
