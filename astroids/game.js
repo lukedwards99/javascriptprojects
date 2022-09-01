@@ -4,35 +4,44 @@
 //const HEIGHT = 600;
 const FPS = 30;
 const MAX_SPEED = 5; //max speed of player (pixels per frame)
-const TURN_SPEED = 3;
+const PLAYER_ACCELERATION = .5 //acceleration of player
+const TURN_SPEED = 5;
 const PROJ_SPEED = 10; //speed of projectiles (px/frame)
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 let upPressed = false;
+let downPressed = false;
 
-//const GameObjects = new Set();
 const Projectiles = new Set();
 
 let player = { //player object
     x: canvas.width / 2,
     y: canvas.height / 2,
-    // xVelo: 0,
-    // yVelo: 0,
     speed: 0,
     moveAngle: 0,
     angle: 0
 }
 
 function UpdatePlayerPos(){
-    if(upPressed == true) {
+    if(upPressed == true && downPressed != true) {
         if(player.speed < MAX_SPEED){
-            player.speed++;
+            player.speed += PLAYER_ACCELERATION;
         }
     }else{
         if(player.speed > 0){
-            player.speed--;
+            player.speed -= PLAYER_ACCELERATION;
+        }
+    }
+
+    if(downPressed == true && upPressed != true) {
+        if(player.speed > (MAX_SPEED * -1)){
+            player.speed -= PLAYER_ACCELERATION;
+        }
+    }else{
+        if(player.speed < 0){
+            player.speed += PLAYER_ACCELERATION;
         }
     }
 
@@ -64,7 +73,7 @@ function DrawProjectiles(){
         ctx.lineTo(10, 20);
         ctx.lineTo( -10, 20);
         ctx.lineTo(0, 0);
-        ctx.strokeStyle = "#000000";
+        ctx.strokeStyle = "#FFFFFF";
         ctx.stroke();
         ctx.restore();  
     });
@@ -87,7 +96,7 @@ function DrawPlayer() {
     ctx.lineTo(10, 20);
     ctx.lineTo( -10, 20);
     ctx.lineTo(0, 0);
-    ctx.strokeStyle = "#000000";
+    ctx.strokeStyle = "#FFFFFF";
     ctx.stroke();
     ctx.restore();  
 }
@@ -100,8 +109,8 @@ function InitEvents() {
             case "ArrowLeft": player.moveAngle = -TURN_SPEED; break;
             case "ArrowRight": player.moveAngle = TURN_SPEED; break;
             case "ArrowUp": upPressed = true; break;
+            case "ArrowDown": downPressed = true; break;
             case "Space": Fire(); break;
-            //default: alert(event.code);
         }
     });
     document.addEventListener('keyup', (event) => {
@@ -110,8 +119,7 @@ function InitEvents() {
             case "ArrowLeft": player.moveAngle = 0; break;
             case "ArrowRight": player.moveAngle = 0; break;
             case "ArrowUp": upPressed = false; break;
-            //case "ArrowDown": ArrowDownEventHandler(); break;
-            //default: alert(event.code);
+            case "ArrowDown": downPressed = false; break;
         }
     });
 }
