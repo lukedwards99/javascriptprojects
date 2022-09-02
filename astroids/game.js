@@ -5,8 +5,10 @@ const MAX_SPEED = 5; //max speed of player (pixels per frame)
 const PLAYER_ACCELERATION = .5 //acceleration of player
 const TURN_SPEED = 5;
 const PROJ_SPEED = 10; //speed of projectiles (px/frame)
-const ASTROID_SPEED = 4;
-const ASTROID_RADIUS = 10;
+const MIN_ASTROID_SPEED = 2;
+const MAX_ASTROID_SPEED = 10;
+const MIN_ASTROID_RADIUS = 10;
+const MAX_ASTROID_RADIUS = 40;
 const PLAYER_RADIUS = 10;
 const MIN_ASTROID_SPAWN_COOLDOWN = 10; //in frames
 
@@ -78,9 +80,7 @@ function DrawProjectiles(){
         ctx.rotate(proj.angle);
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        ctx.lineTo(10, 20);
-        ctx.lineTo( -10, 20);
-        ctx.lineTo(0, 0);
+        ctx.lineTo(0, 20);
         ctx.strokeStyle = "#FFFFFF";
         ctx.stroke();
         ctx.restore();  
@@ -101,18 +101,16 @@ function DrawAstroids(){
 //collisions are all handled by the astroid updateds
 function UpdateAstroidPos(){
     Astroids.forEach(function (ast) {
-        ast.x += ASTROID_SPEED * Math.sin(ast.angle);
-        ast.y -= ASTROID_SPEED * Math.cos(ast.angle);
+        ast.x += ast.speed * Math.sin(ast.angle);
+        ast.y -= ast.speed * Math.cos(ast.angle);
 
         let hit = false;
 
         //collision detection with projectiles
         Projectiles.forEach(function (proj) {
-            const distance = Math.sqrt(Math.pow(ast.x - proj.x, 2) + Math.pow(ast.y - proj.y, 2));
-            if(distance < ast.radius){ 
+            if(CheckCollision(ast, proj, ast.radius)){
                 Projectiles.delete(proj);
                 Astroids.delete(ast);
-
                 hit = true;
             }
         });
@@ -121,14 +119,21 @@ function UpdateAstroidPos(){
             return;
         }
 
-        const distanceFromPlayer = Math.sqrt(Math.pow(ast.x - player.x, 2) + Math.pow(ast.y - player.y, 2));
-        if((distanceFromPlayer < ast.radius + PLAYER_RADIUS) && gameOver === false){
+        if(CheckCollision(ast, player, ast.radius + PLAYER_RADIUS) && gameOver === false){
             gameOver = true
             alert("Game Over!");
             location.reload();
         }
 
     });
+}
+
+function CheckCollision(alpha, beta, min_distance){
+    const distance = Math.sqrt(Math.pow(alpha.x - beta.x, 2) + Math.pow(alpha.y - beta.y, 2));
+    if(distance < min_distance){ 
+        return true;
+    }
+    return false;
 }
 
 function Draw() {
@@ -164,17 +169,27 @@ function DrawPlayer() {
 
 function SpawnAstroid(){
 
-    CreateAstroid(Math.floor(Math.random() * canvas.width), Math.floor(Math.random() * canvas.height), Math.floor(Math.random() * Math.PI * 2));
+    const x = Math.floor(Math.random() * canvas.width);
+    const y = Math.floor(Math.random() * canvas.height);
+    const radius = Math.floor((Math.random() * (MAX_ASTROID_RADIUS - MIN_ASTROID_RADIUS)) + MIN_ASTROID_RADIUS);
+    const angle = Math.floor(Math.random() * Math.PI * 2);
+
+    //skip spawn if on top of player
+    if(CheckCollision(player, {x: x, y: y}, radius) == false){
+        CreateAstroid(x, y, angle, radius);
+    }else{
+        debugger;
+    }
 
 }
 
-function CreateAstroid(_x, _y, _angle){
+function CreateAstroid(_x, _y, _angle, _radius){
     Astroids.add({
         x: _x,
         y: _y,
-        speed: ASTROID_SPEED,
+        speed: Math.floor((Math.random() * (MAX_ASTROID_SPEED - MIN_ASTROID_SPEED)) + MIN_ASTROID_SPEED),
         angle: _angle,
-        radius: ASTROID_RADIUS
+        radius: _radius
     });
 }
 
