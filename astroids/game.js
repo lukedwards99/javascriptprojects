@@ -4,7 +4,7 @@ const FPS = 30;
 const MAX_SPEED = 5; //max speed of player (pixels per frame)
 const PLAYER_ACCELERATION = .5 //acceleration of player
 const TURN_SPEED = 5;
-const PROJ_SPEED = 10; //speed of projectiles (px/frame)
+const PROJ_SPEED = 20; //speed of projectiles (px/frame)
 const MIN_ASTROID_SPEED = 2;
 const MAX_ASTROID_SPEED = 10;
 const MIN_ASTROID_RADIUS = 10;
@@ -18,6 +18,7 @@ const ctx = canvas.getContext("2d");
 let frameNumber = 0;
 let spawnAstroidEvery = 60; //how many frames pass before the next astroid is spawned 
 let score = 0;
+let timeleft = 5;
 let gameOver = false;
 
 let upPressed = false;
@@ -116,6 +117,7 @@ function UpdateAstroidPos(){
         });
 
         if(hit === true){
+            AddScore();
             return;
         }
 
@@ -134,6 +136,11 @@ function CheckCollision(alpha, beta, min_distance){
         return true;
     }
     return false;
+}
+
+function AddScore(){
+    score++;
+    document.getElementById("score").innerHTML = "Score: " + score.toString();
 }
 
 function Draw() {
@@ -158,13 +165,13 @@ function DrawPlayer() {
     ctx.restore();  
 
     //will draw the hitbox of the player
-    // ctx.save();
-    // ctx.translate(player.x, player.y);
-    // ctx.beginPath();
-    // ctx.arc(0, 0, PLAYER_RADIUS, 0, 2 * Math.PI);
-    // ctx.strokeStyle = "#FFFFFF";
-    // ctx.stroke();
-    // ctx.restore();  
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    ctx.beginPath();
+    ctx.arc(0, 0, PLAYER_RADIUS, 0, 2 * Math.PI);
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.stroke();
+    ctx.restore();  
 }
 
 function SpawnAstroid(){
@@ -178,9 +185,9 @@ function SpawnAstroid(){
     if(CheckCollision(player, {x: x, y: y}, radius) == false){
         CreateAstroid(x, y, angle, radius);
     }else{
-        debugger;
+        SpawnAstroid(); //try again if spawned on player
+        return;
     }
-
 }
 
 function CreateAstroid(_x, _y, _angle, _radius){
@@ -214,6 +221,10 @@ function InitEvents() {
             case "ArrowDown": downPressed = false; break;
         }
     });
+
+    document.querySelector(".close").addEventListener('click', function () {
+        document.getElementById("modal").style.display = "none";
+    });
 }
 
 function Fire(){
@@ -245,3 +256,13 @@ const FrameUpdate = setInterval(function () {
     Draw(); 
 
 }, 1000 / FPS);
+
+const TimerUpdate = setInterval(function () {
+    timeleft--;
+
+    if(timeleft <= 0){
+        document.getElementById("modal").style.display = "block";
+    }
+
+    document.getElementById("timeleft").innerHTML = "Time Left: " + timeleft;
+}, 1000);

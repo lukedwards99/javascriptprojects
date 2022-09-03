@@ -4,12 +4,27 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
     <title>Astroids</title>
 </head>
 <body>
-    <div style = "text-align:center;">
-        <canvas id="gameCanvas" width="900" height="600" style="background-color: #000000;"></canvas>
+
+    <div class="mainDisplay">
+        <canvas id="gameCanvas" width="1280" height="720"></canvas>
     </div>
+
+    <div class="flex">
+        <p id="score">Score: 0</p>
+        <p id="timeleft">Time Left: 60</p>
+    </div>
+
+    <div id="modal" class="modal">
+
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>You WIN! Your final score was: <span id="finalscore"></span></p>
+    </div>
+      
 
 
     <script src="game.js"></script>
