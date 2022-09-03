@@ -18,8 +18,12 @@ const ctx = canvas.getContext("2d");
 let frameNumber = 0;
 let spawnAstroidEvery = 60; //how many frames pass before the next astroid is spawned 
 let score = 0;
-let timeleft = 5;
+let timeleft = 60;
 let gameOver = false;
+
+//main clock intervals are set at initilization
+let TimerUpdate;
+let FrameUpdate;
 
 let upPressed = false;
 let downPressed = false;
@@ -200,6 +204,20 @@ function CreateAstroid(_x, _y, _angle, _radius){
     });
 }
 
+function TimeOut(){
+    document.getElementById("modal").style.display = "block";
+    document.getElementById("finalscore").innerHTML = score.toString();
+
+    StopGame();
+}
+
+function StopGame(){
+
+    StopFrameUpdate();
+    StopTimerUpdate();
+
+}
+
 function InitEvents() {
 
     document.addEventListener('keydown', (event) => {
@@ -223,7 +241,8 @@ function InitEvents() {
     });
 
     document.querySelector(".close").addEventListener('click', function () {
-        document.getElementById("modal").style.display = "none";
+        //document.getElementById("modal").style.display = "none";
+        location.reload();
     });
 }
 
@@ -238,31 +257,51 @@ function Fire(){
     Projectiles.add(projectile);
 }
 
+function StartFrameUpdate(){
+    FrameUpdate = setInterval(function () { 
+        frameNumber++;
+    
+        if(frameNumber % spawnAstroidEvery == 0){
+            SpawnAstroid();
+            //console.log("spawn astroid");
+    
+            if(spawnAstroidEvery > MIN_ASTROID_SPAWN_COOLDOWN){
+                spawnAstroidEvery--; //TODO: tweak this logic
+            }
+        }
+    
+        UpdatePhysics();
+        Draw(); 
+    
+    }, 1000 / FPS);
+}
+
+function StopFrameUpdate(){
+    clearInterval(FrameUpdate);
+}
+
+function StartTimerUpdate() {
+    TimerUpdate = setInterval(function () {
+        timeleft--;
+    
+        //gameover
+        if(timeleft <= 0){
+            TimeOut();
+        }
+    
+        document.getElementById("timeleft").innerHTML = "Time Left: " + timeleft;
+    }, 1000);
+}
+
+function StopTimerUpdate(){
+    clearInterval(TimerUpdate);
+}
+
 //actual initilization
 InitEvents();
-const FrameUpdate = setInterval(function () { 
-    frameNumber++;
+StartFrameUpdate();
+StartTimerUpdate();
 
-    if(frameNumber % spawnAstroidEvery == 0){
-        SpawnAstroid();
-        //console.log("spawn astroid");
 
-        if(spawnAstroidEvery > MIN_ASTROID_SPAWN_COOLDOWN){
-            spawnAstroidEvery--; //TODO: tweak this logic
-        }
-    }
 
-    UpdatePhysics();
-    Draw(); 
 
-}, 1000 / FPS);
-
-const TimerUpdate = setInterval(function () {
-    timeleft--;
-
-    if(timeleft <= 0){
-        document.getElementById("modal").style.display = "block";
-    }
-
-    document.getElementById("timeleft").innerHTML = "Time Left: " + timeleft;
-}, 1000);
