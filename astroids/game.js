@@ -227,9 +227,16 @@ function InitEvents() {
             case "ArrowRight": player.moveAngle = TURN_SPEED; break;
             case "ArrowUp": upPressed = true; break;
             case "ArrowDown": downPressed = true; break;
-            case "Space": Fire(); break;
+            //case "Space": Fire(); break;
         }
     });
+
+    document.addEventListener('keypress', (event) => {
+        if(event.code === 'Space'){
+            Fire();
+        }
+    });
+
     document.addEventListener('keyup', (event) => {
 
         switch(event.code){
