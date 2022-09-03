@@ -11,6 +11,7 @@ const MIN_ASTROID_RADIUS = 10;
 const MAX_ASTROID_RADIUS = 40;
 const PLAYER_RADIUS = 10;
 const MIN_ASTROID_SPAWN_COOLDOWN = 10; //in frames
+const PLAYER_SAFE_SPAWN_RADIUS = 200; //radius around player where astroids cant spawn
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -127,8 +128,8 @@ function UpdateAstroidPos(){
 
         if(CheckCollision(ast, player, ast.radius + PLAYER_RADIUS) && gameOver === false){
             gameOver = true
-            alert("Game Over!");
-            location.reload();
+            GameOver();
+            //location.reload();
         }
 
     });
@@ -183,10 +184,12 @@ function SpawnAstroid(){
     const x = Math.floor(Math.random() * canvas.width);
     const y = Math.floor(Math.random() * canvas.height);
     const radius = Math.floor((Math.random() * (MAX_ASTROID_RADIUS - MIN_ASTROID_RADIUS)) + MIN_ASTROID_RADIUS);
-    const angle = Math.floor(Math.random() * Math.PI * 2);
+    //const angle = Math.random() * Math.PI * 2;
+    const angle = Math.atan2((player.y - y), (player.x - x)) + (Math.PI/2);
+    //console.log(angle);
 
     //skip spawn if on top of player
-    if(CheckCollision(player, {x: x, y: y}, radius) == false){
+    if(CheckCollision(player, {x: x, y: y}, PLAYER_SAFE_SPAWN_RADIUS) == false){
         CreateAstroid(x, y, angle, radius);
     }else{
         SpawnAstroid(); //try again if spawned on player
@@ -205,8 +208,17 @@ function CreateAstroid(_x, _y, _angle, _radius){
 }
 
 function TimeOut(){
-    document.getElementById("modal").style.display = "block";
-    document.getElementById("finalscore").innerHTML = score.toString();
+    const modal = document.getElementById("modal");
+    modal.style.display = "block";
+    document.getElementById("modal-text").innerHTML = "Your final score was <b>" + score.toString() + "</b>";
+
+    StopGame();
+}
+
+function GameOver(){
+    const modal = document.getElementById("modal");
+    modal.style.display = "block";
+    document.getElementById("modal-text").innerHTML = "GAME OVER! Try again?";
 
     StopGame();
 }
@@ -246,11 +258,6 @@ function InitEvents() {
             case "ArrowDown": downPressed = false; break;
         }
     });
-
-    document.querySelector(".close").addEventListener('click', function () {
-        //document.getElementById("modal").style.display = "none";
-        location.reload();
-    });
 }
 
 function Fire(){
@@ -270,10 +277,9 @@ function StartFrameUpdate(){
     
         if(frameNumber % spawnAstroidEvery == 0){
             SpawnAstroid();
-            //console.log("spawn astroid");
     
             if(spawnAstroidEvery > MIN_ASTROID_SPAWN_COOLDOWN){
-                spawnAstroidEvery--; //TODO: tweak this logic
+                spawnAstroidEvery--;
             }
         }
     

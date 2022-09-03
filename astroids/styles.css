@@ -50,6 +50,7 @@ canvas {
 
 /* Modal Content */
 .modal-content {
+    text-align: center;
     background-color: #6a6a6a;
     margin: auto;
     padding: 20px;
@@ -58,7 +59,7 @@ canvas {
 }
 
 /* The Close Button */
-.close {
+/* .close {
     color: #000000;
     float: right;
     font-size: 50px;
@@ -70,15 +71,11 @@ canvas {
     color: #000;
     text-decoration: none;
     cursor: pointer;
-}
+} */
 
-#final-score-text {
-    color: rgb(56, 56, 56);
+#modal-text {
+    color: rgb(0, 0, 0);
     font-size: 23px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-style: bold;
-}
-
-#finalscore{
-    color: rgb(0, 0, 0);
 }
