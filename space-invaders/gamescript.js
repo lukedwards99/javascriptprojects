@@ -11,8 +11,6 @@ const MIN_DIFFICULTY_SCORE = 20;
 const MIN_DIFFICULTY_SPAWN_RATE = .10;
 const POWER_UP_PROB = .25;
 
-
-
 const FireBalls = new Set();
 const Aliens = new Set();
 const PowerUps = new Set();
@@ -32,7 +30,6 @@ let playerHasPowerup = false;
 let PlayerRowIndex = NUM_ROWS - 1;
 let PlayerColIndex = 6;
 //let PlayerColIndex = Math.floor(NUM_COLS / 2);
-
 
 function HandleFireBalls() {
 
@@ -150,9 +147,6 @@ function ArrowRightEventHandler(){
     document.querySelector('[data-rowindex="' + (NUM_ROWS - 1) + '"] > [data-colindex="' + PlayerColIndex + '"]').appendChild(player);
 }
 
-
-
-
 function FireEventHandler(){
     if (fireballCooldown > 0){
         return;
@@ -201,8 +195,6 @@ function SetDifficultyProbability(){
     } else {
         probablitySpawnNextTick = MAX_DIFFICULTY_SPAWN_RATE + MIN_DIFFICULTY_SPAWN_RATE;
     }
-
-    //console.log(probablitySpawnNextTick);
 }
 
 function CreateAlien(_row, _col){// note that once update method is called the first frame that it is displayed
@@ -220,7 +212,6 @@ function CreateAlien(_row, _col){// note that once update method is called the f
 
 function HandlePlayerStatusBars(){
 
-    //Fire progress bar
     let firebar = document.getElementById("fireballProgressBar");
     if(fireballCooldown <= 0){
         firebar.style.width = "100%";
@@ -267,7 +258,6 @@ function InitEvents(){
     document.getElementById("panicButton").addEventListener('click', PanicEventHandler);
 }
 
-
 //Handles spawning of all elements by reading the alien spawn array at the end of the script
 let SpawnIndex = null; //spawn index is used to keep track of where in the spawning cycle I am at.
 let SpawnPattern = null;
@@ -294,7 +284,6 @@ function Spawn() {
                 CreateAlien(-1, i);
             }
         }
-
     }
 
     SpawnIndex++;
@@ -308,7 +297,6 @@ function Spawn() {
 function HandlePowerUps() {
 
     PowerUps.forEach( function(pu) {
-
         if(pu.elem == null || pu.row == null || pu.col == null){ //if any fields are empty dont update the object and delete it
             try {
                 pu.elem.remove();
@@ -336,10 +324,7 @@ function HandlePowerUps() {
             return;
         }
 
-        //debugger;
         document.querySelector('[data-rowindex="' + pu.row + '"] > [data-colindex="' + pu.col + '"]').appendChild(pu.elem);
-    
-        
     });
 
 }
@@ -355,14 +340,12 @@ function CreatePowerUp(_row, _col) { // note that once update method is called t
         row: _row,
         col: _col
     });
-
 }
 
 function SpawnPowerUps() {
 
     const spawnCol = Math.floor(Math.random() * NUM_COLS)
     CreatePowerUp(-1, );
-
 }
 
 /*** INITIALIZATION HAPPENS HERE!!!***/
@@ -390,16 +373,10 @@ window.addEventListener('load', function () {
         squareRed = !squareRed;
     }
 
-
     //init player
     player = document.getElementById('PlayerElem');
     player.src = "PlayerFire.png"
     document.querySelector('[data-rowindex="' + PlayerRowIndex + '"] > [data-colindex="' + PlayerColIndex + '"]').appendChild(player);
-
-
-    // CreateAlien(0,5);
-    // CreateFireBall(5,5);
-
 
     //initilize events
     InitEvents();
@@ -412,7 +389,6 @@ window.addEventListener('load', function () {
         if(lastAlienMove > ALIEN_TICK_UPDATE) { //aliens only move every 2 ticks
             Spawn();
             HandleAliens();
-            //SpawnPowerUps();
             HandlePowerUps();
             lastAlienMove = 0;
             if(firstAlienTick) { //game start up call
@@ -428,8 +404,6 @@ window.addEventListener('load', function () {
         DetectCollision();
         HandlePlayerStatusBars();
 
-        
-        
     }, TICK_INTERVAL);
 });
 

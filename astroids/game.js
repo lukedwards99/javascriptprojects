@@ -5,12 +5,12 @@ const MAX_SPEED = 5; //max speed of player (pixels per frame)
 const PLAYER_ACCELERATION = .25 //acceleration of player
 const TURN_SPEED = 5;
 const PROJ_SPEED = 20; //speed of projectiles (px/frame)
-const PROJ_LENGTH = 40; //shouldnt be less that PROJ_SPEED.
+const PROJ_LENGTH = 20; //shouldnt be less that PROJ_SPEED.
 const MIN_ASTROID_SPEED = 2;
 const SPEED_PUNSHIMENT = 2; //if player is standing still min astroid speed goes up (shouldnt be larger than MIN_ASTROID_RADIUS - MIN_ASTROID_SPEED)
-const MAX_ASTROID_SPEED = 7;
+const MAX_ASTROID_SPEED = 15;
 const MIN_ASTROID_RADIUS = 10;
-const RADIUS_PUNISHMENT = 5; //if player is standing still min astroid radius goes down (shouldnt be less than MIN_ASTROID_RADIUS)
+const RADIUS_PUNISHMENT = 10; //if player is standing still min astroid radius goes down (shouldnt be less than MIN_ASTROID_RADIUS)
 const MAX_ASTROID_RADIUS = 40;
 const PLAYER_RADIUS = 10;
 const MIN_ASTROID_SPAWN_COOLDOWN = 10; //in frames
@@ -32,6 +32,7 @@ let FrameUpdate;
 
 let upPressed = false;
 let downPressed = false;
+let spacePressed = false;
 
 const Projectiles = new Set();
 const Astroids = new Set();
@@ -69,6 +70,10 @@ function UpdatePlayerPos(){
         if(player.speed < 0){
             player.speed += PLAYER_ACCELERATION;
         }
+    }
+
+    if(spacePressed == true){
+        Fire();
     }
 
     player.angle += player.moveAngle * Math.PI / 180;
@@ -238,9 +243,11 @@ function SpawnAstroid(){
     const speed = Math.floor((Math.random() * (MAX_ASTROID_SPEED - MIN_ASTROID_SPEED)) + MIN_ASTROID_SPEED);
 
     //skip spawn if on top of player
-    if(upPressed == true && (CheckCollision(player, {x: x, y: y}, PLAYER_SAFE_SPAWN_RADIUS) == false)){
+    if(spacePressed == false && (CheckCollision(player, {x: x, y: y}, PLAYER_SAFE_SPAWN_RADIUS) == false)){
+        console.log("easy spawn");
         CreateAstroid(x, y, angle, radius, speed);
-    }else if(upPressed == false && CheckCollision(player, {x: x, y: y}, PLAYER_SAFE_SPAWN_RADIUS / 2) == false){ //to discourage camping and spinning
+    }else if(spacePressed == true && CheckCollision(player, {x: x, y: y}, PLAYER_SAFE_SPAWN_RADIUS / 2) == false){ //to discourage camping and spinning
+        console.log("hard spawn");
         CreateAstroid(x, y, angle, radius - RADIUS_PUNISHMENT, Math.floor((Math.random() * (MAX_ASTROID_SPEED - MIN_ASTROID_SPEED + SPEED_PUNSHIMENT)) + MIN_ASTROID_SPEED + SPEED_PUNSHIMENT));
     }else{
         SpawnAstroid(); //try again if spawned on player
@@ -294,15 +301,16 @@ function InitEvents() {
             case "ArrowUp": upPressed = true; break;
             case "KeyS":
             case "ArrowDown": downPressed = true; break;
+            case "Space": spacePressed = true; break;
             //case "Space": Fire(); break;
         }
     });
 
-    document.addEventListener('keypress', (event) => {
-        if(event.code === 'Space'){
-            Fire();
-        }
-    });
+    // document.addEventListener('keypress', (event) => {
+    //     if(event.code === 'Space'){
+    //         Fire();
+    //     }
+    // });
 
     document.addEventListener('keyup', (event) => {
 
@@ -315,6 +323,7 @@ function InitEvents() {
             case "ArrowUp": upPressed = false; break;
             case "KeyS":
             case "ArrowDown": downPressed = false; break;
+            case "Space": spacePressed = false; break;
         }
     });
 }
@@ -379,7 +388,3 @@ function StopTimerUpdate(){
 InitEvents();
 StartFrameUpdate();
 StartTimerUpdate();
-
-
-
-
