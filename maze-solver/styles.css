@@ -1,9 +1,19 @@
 .cell {
     border-style: solid;
     border-width: 2px;
-    border-color: #292929;
+    border-color: #a9a9a9;
 }
 
 .row {
     display: flex;
+}
+
+.controls{
+    position: relative;
+}
+
+.controlsN {
+    position: absolute;
+    left: 40%;
+    top: 10%;
 }
