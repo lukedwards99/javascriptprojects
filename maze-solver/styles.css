@@ -1,3 +1,7 @@
+button {
+    margin: 10px;
+}
+
 .cell {
     border-style: solid;
     border-width: 2px;
@@ -25,5 +29,19 @@
 .controlsW {
     position: absolute;
     left: 10%;
+}
+
+.flexcenter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.start {
+    background-color: greenyellow;
+}
+
+.end {
+    background-color: red;
 }
 

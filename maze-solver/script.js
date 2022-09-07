@@ -3,10 +3,13 @@
 const NUM_ROWS = 10;
 const NUM_COLS = NUM_ROWS; // future proofing
 
-const GRID_DIM = window.innerHeight * .9; // grid will be a square
+const GRID_DIM = window.innerHeight * .75; // grid will be a square
 
 const CELL_HEIGHT = GRID_DIM / NUM_ROWS;
 const CELL_WIDTH = GRID_DIM / NUM_COLS;
+
+let selectingStart = false;
+let selectingEnd = false;
 
 
 const $grid = $('#grid');
@@ -54,8 +57,57 @@ $(".cell").on('mouseleave', function() {
 
 });
 
+$(".cell").on('click', function () {
+    const $this = $(this);
+
+
+    if(selectingStart){
+
+        if($this.hasClass("end")){
+            return;
+        }
+        
+        $(".start").removeClass("start");
+        $this.addClass("start");
+
+        selectingStart = false;
+    }
+
+    if(selectingEnd){
+
+        if($this.hasClass("start")){
+            return;
+        }
+        
+        $(".end").removeClass("end");
+        $this.addClass("end");
+
+        selectingEnd = false;
+    }
+
+});
+
+$("#setstart").on('click', function () {
+    if(selectingEnd){
+        return;
+    }
+
+    selectingStart = true;
+});
+
+$("#setend").on('click', function () {
+    if(selectingStart){
+        return;
+    }
+    selectingEnd = true;
+});
+
 //event handler for clicks of adding the walls
 function AddWallHandler(){
+
+    if(selectingStart || selectingEnd){
+        return;
+    }
 
     const $this = $(this);
     const $cell = $this.parents(".cell");
