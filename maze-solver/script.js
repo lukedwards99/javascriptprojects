@@ -19,21 +19,36 @@ for(let i = 0; i < NUM_ROWS; i++){
     for(let j = 0; j < NUM_COLS; j++){
         const cell = $('<div></div>').addClass("cell").width(CELL_WIDTH).height(CELL_HEIGHT).attr("data-row", i).attr("data-col", j);
         row.append(cell);
+        const controls = $("<div></div>").addClass('controls');
+        //north
+        controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .1)).addClass("controlsNS"));
+        //south
+        controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .7)).addClass("controlsNS"));
+        //east
+        controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4)).addClass("controlsE"));
+        //west
+        controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4)).addClass("controlsW"));
+
+        controls.css("display", "none");
+        cell.append(controls);
     }
 }
 
 $(".cell").on('mouseenter', function() {
-    let $this = $(this);
 
-    const controls = $("<div></div>").addClass('controls');
-    controls.append($("<div></div>").height($this .height() * .2).width($this .width() * .2).css('background-color', "#000000").css("border-radius", "50%").addClass("controlsN"));
-    $this.append(controls);
+    let $this = $(this);
+    $this.children(".controls").css("display", "flex");
 
 });
 
 $(".cell").on('mouseleave', function() {
 
-    $(this).children('.controls').remove();
+    let $this = $(this);
+    $this.children(".controls").css("display", "none");
 
 });
 

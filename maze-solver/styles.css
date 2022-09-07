@@ -12,8 +12,18 @@
     position: relative;
 }
 
-.controlsN {
+.controlsNS {
     position: absolute;
     left: 40%;
-    top: 10%;
 }
+
+.controlsE {
+    position: absolute;
+    left: 70%;
+}
+
+.controlsW {
+    position: absolute;
+    left: 10%;
+}
+
