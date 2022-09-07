@@ -11,3 +11,7 @@ This is a simple spin off of space invaders and was the first game I made. I dev
 ## Astroids
 
 This is a recreation of the old astroids game. I used this project to get more comfortable with the canvas in HTML and JavaScript.
+
+## Maze Solver (started 9-7)
+
+This is not a pure JS game because I wanted flex my jQuery muscles and do some fun animations. This is a simple game that allowes the user to create a maze and then have the computer solve it. 
