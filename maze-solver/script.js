@@ -11,8 +11,6 @@ const CELL_WIDTH = GRID_DIM / NUM_COLS;
 
 const $grid = $('#grid');
 
-//alert($grid.css("width"));
-
 for(let i = 0; i < NUM_ROWS; i++){
     const row = $('<div></div>').addClass("row");
     $grid.append(row);
@@ -22,16 +20,20 @@ for(let i = 0; i < NUM_ROWS; i++){
         const controls = $("<div></div>").addClass('controls');
         //north
         controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
-            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .1)).addClass("controlsNS"));
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .1))
+            .addClass("controlsNS").attr("data-side", "N").on('click', AddWallHandler));
         //south
         controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
-            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .7)).addClass("controlsNS"));
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .7))
+            .addClass("controlsNS").attr("data-side", "S").on('click', AddWallHandler));
         //east
         controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
-            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4)).addClass("controlsE"));
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4))
+            .addClass("controlsE").attr("data-side", "E").on('click', AddWallHandler));
         //west
         controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
-            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4)).addClass("controlsW"));
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4))
+            .addClass("controlsW").attr("data-side", "W").on('click', AddWallHandler));
 
         controls.css("display", "none");
         cell.append(controls);
@@ -40,22 +42,51 @@ for(let i = 0; i < NUM_ROWS; i++){
 
 $(".cell").on('mouseenter', function() {
 
-    let $this = $(this);
+    const $this = $(this);
     $this.children(".controls").css("display", "flex");
 
 });
 
 $(".cell").on('mouseleave', function() {
 
-    let $this = $(this);
+    const $this = $(this);
     $this.children(".controls").css("display", "none");
 
 });
 
-$(".cell").on('click', function(){
+//event handler for clicks of adding the walls
+function AddWallHandler(){
 
-    alert($(this).attr("data-row").toString() + " " + $(this).attr("data-col").toString());
-
-});
-
-//alert("done");
+    const $this = $(this);
+    const $cell = $this.parents(".cell");
+    
+    const row = parseInt($cell.attr("data-row"));
+    const col = parseInt($cell.attr("data-col"));
+    
+    switch ($this.attr("data-side")) {
+        case "N": 
+            $cell.attr("data-nwall", true).css("border-top-color", "#000000");
+            if(row > 0){
+                $('.cell[data-row="' + (row - 1) + '"][data-col="' + col + '"]').attr("data-swall", true).css("border-bottom-color", "#000000");
+            } 
+            break;
+        case "S": 
+            $cell.attr("data-swall", true).css("border-bottom-color", "#000000"); 
+            if(row < NUM_ROWS){
+                $('.cell[data-row="' + (row + 1) + '"][data-col="' + col + '"]').attr("data-nwall", true).css("border-top-color", "#000000");
+            } 
+            break;
+        case "E": 
+            $cell.attr("data-ewall", true).css("border-right-color", "#000000");
+            if(col < NUM_COLS){
+                $('.cell[data-row="' + (row) + '"][data-col="' + (col + 1) + '"]').attr("data-wwall", true).css("border-left-color", "#000000");
+            } 
+            break;
+        case "W": 
+            $cell.attr("data-wwall", true).css("border-left-color", "#000000"); 
+            if(col > 0){
+                $('.cell[data-row="' + (row) + '"][data-col="' + (col - 1) + '"]').attr("data-ewall", true).css("border-right-color", "#000000");
+            } 
+            break;
+    }
+}
