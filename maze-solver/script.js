@@ -71,6 +71,7 @@ $(".cell").on('click', function () {
         $this.addClass("start");
 
         selectingStart = false;
+        return;
     }
 
     if(selectingEnd){
@@ -83,6 +84,7 @@ $(".cell").on('click', function () {
         $this.addClass("end");
 
         selectingEnd = false;
+        return;
     }
 
 });
@@ -100,6 +102,10 @@ $("#setend").on('click', function () {
         return;
     }
     selectingEnd = true;
+});
+
+$("#findpath").on('click', function () {
+    FindPath();
 });
 
 //event handler for clicks of adding the walls
@@ -142,3 +148,24 @@ function AddWallHandler(){
             break;
     }
 }
+
+function FindPath(){
+    //starting with : https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+
+    const Cells = [];
+
+    $(".cell").each(function (){
+        if($(this).hasClass("start")) {
+            Cells.push({"elem": $(this), "dist": 0});
+            //alert($(this).attr("data-row") + " " + $(this).attr("data-col"))
+        }else{
+            Cells.push({elem: $(this), dist: 999999});
+        }
+    });
+
+    Cells.sort(function(a, b) {return a.dist - b.dist;});
+
+    //alert(Cells[0].elem.attr("data-row") + " " + Cells[0].elem.attr("data-col"))
+
+}
+
