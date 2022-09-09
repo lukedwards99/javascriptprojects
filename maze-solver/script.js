@@ -243,28 +243,56 @@ function AddWallHandler(){
     
     switch ($this.attr("data-side")) {
         case "N": 
-            $cell.attr("data-nwall", "true").css("border-top-color", "#000000");
-            if(row > 0){
-                $('.cell[data-row="' + (row - 1) + '"][data-col="' + col + '"]').attr("data-swall", "true").css("border-bottom-color", "#000000");
-            } 
+            if($cell.attr("data-nwall") !== "true"){
+                $cell.attr("data-nwall", "true").css("border-top-color", "#000000");
+                if(row > 0){
+                    $('.cell[data-row="' + (row - 1) + '"][data-col="' + col + '"]').attr("data-swall", "true").css("border-bottom-color", "#000000");
+                } 
+            }else{
+                $cell.attr("data-nwall", "false").css("border-top-color", "#a9a9a9");
+                if(row > 0){
+                    $('.cell[data-row="' + (row - 1) + '"][data-col="' + col + '"]').attr("data-swall", "false").css("border-bottom-color", "#a9a9a9");
+                } 
+            }
             break;
         case "S": 
-            $cell.attr("data-swall", "true").css("border-bottom-color", "#000000"); 
-            if(row < NUM_ROWS){
-                $('.cell[data-row="' + (row + 1) + '"][data-col="' + col + '"]').attr("data-nwall", "true").css("border-top-color", "#000000");
-            } 
+            if($cell.attr("data-swall") !== "true"){
+                $cell.attr("data-swall", "true").css("border-bottom-color", "#000000"); 
+                if(row < NUM_ROWS){
+                    $('.cell[data-row="' + (row + 1) + '"][data-col="' + col + '"]').attr("data-nwall", "true").css("border-top-color", "#000000");
+                } 
+            }else{
+                $cell.attr("data-swall", "false").css("border-bottom-color", "#a9a9a9");
+                if(row < NUM_ROWS){
+                    $('.cell[data-row="' + (row + 1) + '"][data-col="' + col + '"]').attr("data-nwall", "false").css("border-top-color", "#a9a9a9");
+                } 
+            }
             break;
         case "E": 
-            $cell.attr("data-ewall", "true").css("border-right-color", "#000000");
-            if(col < NUM_COLS){
-                $('.cell[data-row="' + (row) + '"][data-col="' + (col + 1) + '"]').attr("data-wwall", "true").css("border-left-color", "#000000");
-            } 
+            if($cell.attr("data-ewall") !== "true"){
+                $cell.attr("data-ewall", "true").css("border-right-color", "#000000");
+                if(col < NUM_COLS){
+                    $('.cell[data-row="' + (row) + '"][data-col="' + (col + 1) + '"]').attr("data-wwall", "true").css("border-left-color", "#000000");
+                }
+            }else{
+                $cell.attr("data-ewall", "false").css("border-right-color", "#a9a9a9");
+                if(col < NUM_COLS){
+                    $('.cell[data-row="' + (row) + '"][data-col="' + (col + 1) + '"]').attr("data-wwall", "false").css("border-left-color", "#a9a9a9");
+                } 
+            }
             break;
         case "W": 
-            $cell.attr("data-wwall", "true").css("border-left-color", "#000000"); 
-            if(col > 0){
-                $('.cell[data-row="' + (row) + '"][data-col="' + (col - 1) + '"]').attr("data-ewall", "true").css("border-right-color", "#000000");
-            } 
+            if($cell.attr("data-wwall") !== "true"){
+                $cell.attr("data-wwall", "true").css("border-left-color", "#000000"); 
+                if(col > 0){
+                    $('.cell[data-row="' + (row) + '"][data-col="' + (col - 1) + '"]').attr("data-ewall", "true").css("border-right-color", "#000000");
+                } 
+            }else{
+                $cell.attr("data-wwall", "false").css("border-left-color", "#a9a9a9");
+                if(col > 0){
+                    $('.cell[data-row="' + (row) + '"][data-col="' + (col - 1) + '"]').attr("data-ewall", "false").css("border-right-color", "#a9a9a9");
+                } 
+            }
             break;
     }
 }
