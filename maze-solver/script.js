@@ -86,7 +86,6 @@ $(".cell").on('click', function () {
         selectingEnd = false;
         return;
     }
-
 });
 
 $("#setstart").on('click', function () {
@@ -123,27 +122,27 @@ function AddWallHandler(){
     
     switch ($this.attr("data-side")) {
         case "N": 
-            $cell.attr("data-nwall", true).css("border-top-color", "#000000");
+            $cell.attr("data-nwall", "true").css("border-top-color", "#000000");
             if(row > 0){
-                $('.cell[data-row="' + (row - 1) + '"][data-col="' + col + '"]').attr("data-swall", true).css("border-bottom-color", "#000000");
+                $('.cell[data-row="' + (row - 1) + '"][data-col="' + col + '"]').attr("data-swall", "true").css("border-bottom-color", "#000000");
             } 
             break;
         case "S": 
-            $cell.attr("data-swall", true).css("border-bottom-color", "#000000"); 
+            $cell.attr("data-swall", "true").css("border-bottom-color", "#000000"); 
             if(row < NUM_ROWS){
-                $('.cell[data-row="' + (row + 1) + '"][data-col="' + col + '"]').attr("data-nwall", true).css("border-top-color", "#000000");
+                $('.cell[data-row="' + (row + 1) + '"][data-col="' + col + '"]').attr("data-nwall", "true").css("border-top-color", "#000000");
             } 
             break;
         case "E": 
-            $cell.attr("data-ewall", true).css("border-right-color", "#000000");
+            $cell.attr("data-ewall", "true").css("border-right-color", "#000000");
             if(col < NUM_COLS){
-                $('.cell[data-row="' + (row) + '"][data-col="' + (col + 1) + '"]').attr("data-wwall", true).css("border-left-color", "#000000");
+                $('.cell[data-row="' + (row) + '"][data-col="' + (col + 1) + '"]').attr("data-wwall", "true").css("border-left-color", "#000000");
             } 
             break;
         case "W": 
-            $cell.attr("data-wwall", true).css("border-left-color", "#000000"); 
+            $cell.attr("data-wwall", "true").css("border-left-color", "#000000"); 
             if(col > 0){
-                $('.cell[data-row="' + (row) + '"][data-col="' + (col - 1) + '"]').attr("data-ewall", true).css("border-right-color", "#000000");
+                $('.cell[data-row="' + (row) + '"][data-col="' + (col - 1) + '"]').attr("data-ewall", "true").css("border-right-color", "#000000");
             } 
             break;
     }
@@ -152,20 +151,116 @@ function AddWallHandler(){
 function FindPath(){
     //starting with : https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
-    const Cells = [];
+    // const Cells = [];
 
-    $(".cell").each(function (){
-        if($(this).hasClass("start")) {
-            Cells.push({"elem": $(this), "dist": 0});
-            //alert($(this).attr("data-row") + " " + $(this).attr("data-col"))
-        }else{
-            Cells.push({elem: $(this), dist: 999999});
+    // $(".cell").each(function (){
+    //     if($(this).hasClass("start")) {
+    //         Cells.push({"elem": $(this), "dist": 0});
+    //         //alert($(this).attr("data-row") + " " + $(this).attr("data-col"))
+    //     }else{
+    //         Cells.push({elem: $(this), dist: 999999});
+    //     }
+    // });
+    $(".cell").attr("data-dist", Number.MAX_SAFE_INTEGER);
+    $(".cell").attr("data-explored", "false");
+
+    $(".start").attr("data-dist", "0"); //since start has no 
+
+    
+    while(true){
+        const CurrCell = GetNextCell();
+        if(CurrCell == null){
+            break;
         }
-    });
+        CurrCell.attr("data-explored", "true");
 
-    Cells.sort(function(a, b) {return a.dist - b.dist;});
+        const Neighbors = GetValidNeighbors(CurrCell);
+
+        const distFromStart = parseInt(CurrCell.attr("data-dist")) + 1;
+
+        Neighbors.forEach(function (elem) {
+            if(parseInt(elem.attr("data-dist")) > distFromStart){
+                elem.attr("data-dist", distFromStart.toString());
+                elem.text(distFromStart.toString());
+            }
+        });
+
+        //debugger;
+
+    }
+
+    // const nextCell = GetNextCell()
+
+    // //alert(nextCell.attr("data-row") + " " + nextCell.attr("data-col"));
+
+    // const distFromStart = parseInt(nextCell.attr("data-dist")) + 1;
+
+    // GetValidNeighbors(nextCell).forEach(function (val){
+    //     if(parseInt(val.attr("data-dist")) > distFromStart){
+    //         val.attr("data-dist", distFromStart.toString());
+    //         val.text(distFromStart.toString());
+    //     }
+    // });
 
     //alert(Cells[0].elem.attr("data-row") + " " + Cells[0].elem.attr("data-col"))
 
 }
 
+function GetNextCell(){
+    let returnCell = null;
+    let minDist = Number.MAX_SAFE_INTEGER;
+
+    $('.cell').each(function () {
+        if(parseInt($(this).attr("data-dist")) < minDist && $(this).attr("data-explored") === "false"){
+            returnCell = $(this);
+            minDist = parseInt(returnCell.attr("data-dist"));
+        }
+    });
+
+    return returnCell;
+}
+
+function IsUnexploredCells(){
+
+    $('.cell').each(function () {
+        if($(this).attr("data-explored") === "false"){
+            return false;
+        }
+    });
+    
+    return true;
+}
+
+function GetValidNeighbors(CurrCell) {
+    const Neighbors = [];
+    const row = parseInt(CurrCell.attr("data-row"));
+    const col = parseInt(CurrCell.attr("data-col"));
+
+    if(col > 0 && CurrCell.attr("data-wwall") != "true"){
+        Neighbors.push(GetCell(row, col - 1));
+    }
+    if(col < NUM_COLS && CurrCell.attr("data-ewall") != "true"){
+        Neighbors.push(GetCell(row, col + 1));
+    }
+    if(row > 0 && CurrCell.attr("data-nwall") != "true"){
+        Neighbors.push(GetCell(row - 1, col));
+    }
+    if(row < NUM_ROWS && CurrCell.attr("data-swall") != "true"){
+        Neighbors.push(GetCell(row + 1, col));
+    }
+    //debugger;
+    Neighbors.filter(function (elem) { //remove explored elements
+        //debugger;
+        if(elem.attr("data-explored") === "true"){
+            return false;
+        }
+    });
+
+    return Neighbors;
+}
+
+
+function GetCell(row, col){
+
+    return $('.cell[data-row="' + row + '"][data-col="' + col + '"]')
+}
