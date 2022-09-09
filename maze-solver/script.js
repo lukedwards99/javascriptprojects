@@ -21,20 +21,21 @@ for(let i = 0; i < NUM_ROWS; i++){
         const cell = $('<div></div>').addClass("cell").width(CELL_WIDTH).height(CELL_HEIGHT).attr("data-row", i).attr("data-col", j);
         row.append(cell);
         const controls = $("<div></div>").addClass('controls');
+        //we use height for both width and hight so they stay clean circles
         //north
-        controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
+        controls.append($("<div></div>").height(cell.height() * .2).width(cell.height() * .2)
             .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .1))
             .addClass("controlsNS").attr("data-side", "N").on('click', AddWallHandler));
         //south
-        controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
+        controls.append($("<div></div>").height(cell.height() * .2).width(cell.height() * .2)
             .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .7))
             .addClass("controlsNS").attr("data-side", "S").on('click', AddWallHandler));
         //east
-        controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
+        controls.append($("<div></div>").height(cell.height() * .2).width(cell.height() * .2)
             .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4))
             .addClass("controlsE").attr("data-side", "E").on('click', AddWallHandler));
         //west
-        controls.append($("<div></div>").height(cell.height() * .2).width(cell.width() * .2)
+        controls.append($("<div></div>").height(cell.height() * .2).width(cell.height() * .2)
             .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4))
             .addClass("controlsW").attr("data-side", "W").on('click', AddWallHandler));
 
@@ -302,9 +303,6 @@ function FindPathDijkstra(){
                 elem.text(distFromStart.toString());
             }
         });
-
-        //debugger;
-
     }
 
     if($(".end").attr("data-pathtostart-col") == null){
