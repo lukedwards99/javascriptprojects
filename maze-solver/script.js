@@ -163,7 +163,7 @@ function FindPath(){
     $(".start").attr("data-dist", "0"); //since start has no 
 
     
-    while(true){
+    while(true){ //get min paths
         const CurrCell = GetNextCell();
         if(CurrCell == null){
             break;
@@ -177,6 +177,8 @@ function FindPath(){
         Neighbors.forEach(function (elem) {
             if(parseInt(elem.attr("data-dist")) > distFromStart){
                 elem.attr("data-dist", distFromStart.toString());
+                elem.attr("data-pathtostart-col", CurrCell.attr("data-col"));
+                elem.attr("data-pathtostart-row", CurrCell.attr("data-row"));
                 elem.text(distFromStart.toString());
             }
         });
@@ -184,6 +186,24 @@ function FindPath(){
         //debugger;
 
     }
+
+    if($(".end").attr("data-pathtostart-col") == null){
+        alert("NO VALID PATH");
+        return;
+    }
+
+    NavigateBackwards();
+}
+
+function NavigateBackwards(){
+
+    let CurrCell = $(".end");
+
+    while(CurrCell.hasClass("start") != true){
+        CurrCell.css("background-color", "blue");
+        CurrCell = GetCell(CurrCell.attr("data-pathtostart-row"), CurrCell.attr("data-pathtostart-col"));
+    }
+
 }
 
 function GetNextCell(){
