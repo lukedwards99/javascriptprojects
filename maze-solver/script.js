@@ -104,8 +104,128 @@ $("#setend").on('click', function () {
 });
 
 $("#findpath").on('click', function () {
-    FindPath();
+    FindPathDijkstra();
 });
+
+$("#genmaze").on('click', function () {
+    GenMazeDepthFirst();
+});
+
+function GenMazeDepthFirst(){
+
+    //using https://en.wikipedia.org/wiki/Maze_generation_algorithm
+
+    //reset maze
+    $(".cell").attr("data-nwall", "true").css("border-top-color", "#000000")
+                .attr("data-swall", "true").css("border-bottom-color", "#000000")
+                .attr("data-ewall", "true").css("border-right-color", "#000000")
+                .attr("data-wwall", "true").css("border-left-color", "#000000")
+                .attr("data-explored", "false");
+    
+    const Stack = [];
+
+    const StartCell = GetCell(Math.floor(Math.random() * NUM_ROWS), Math.floor(Math.random() * NUM_COLS))
+    StartCell.attr("data-explored", "true");
+    Stack.push(StartCell);// starting cell
+
+    while(Stack.length > 0){
+        const CurrCell = Stack.pop();
+
+        if(CellHasUnvistedNeighbors(CurrCell)){
+            Stack.push(CurrCell);
+            const NextCell = ChooseNeighbor(CurrCell);
+            RemoveWall(CurrCell, NextCell);
+            NextCell.attr("data-explored", "true");
+            Stack.push(NextCell);
+        }
+    }
+
+    function RemoveWall(alpha, beta){ //DOES NOT CHECK IF CELLS ARE NEIGHBORS
+
+        const alphaRow = GetRow(alpha);
+        const alphaCol = GetCol(alpha);
+        const betaRow = GetRow(beta);
+        const betaCol = GetCol(beta);
+
+        if(alphaRow < betaRow) { 
+            alpha.attr("data-swall", "false").css("border-bottom-color", "#a9a9a9");
+            beta.attr("data-nwall", "false").css("border-top-color", "#a9a9a9");
+        } else if (alphaRow > betaRow) {
+            alpha.attr("data-nwall", "false").css("border-top-color", "#a9a9a9");
+            beta.attr("data-swall", "false").css("border-bottom-color", "#a9a9a9");
+        } else if (alphaCol < betaCol) {
+            alpha.attr("data-ewall", "false").css("border-right-color", "#a9a9a9");
+            beta.attr("data-wwall", "false").css("border-left-color", "#a9a9a9");
+        } else if (alphaCol > betaCol) {
+            alpha.attr("data-wwall", "false").css("border-left-color", "#a9a9a9");
+            beta.attr("data-ewall", "false").css("border-right-color", "#a9a9a9");
+        }
+    }
+
+
+    //local functions for gen maze
+    function CellHasUnvistedNeighbors(CurrCell){
+        const row = parseInt(CurrCell.attr("data-row"));
+        const col = parseInt(CurrCell.attr("data-col"));
+
+        if(col > 0 && GetCell(row, col - 1).attr("data-explored") === "false"){
+            return true;
+        }
+        if(col < NUM_COLS && GetCell(row, col + 1).attr("data-explored") === "false"){
+            return true;
+        }
+        if(row > 0 && GetCell(row - 1, col).attr("data-explored") === "false"){
+            return true;
+        }
+        if(row < NUM_ROWS && GetCell(row + 1, col).attr("data-explored") === "false"){
+            return true;
+        }
+
+        return false;
+    }
+
+    function ChooseNeighbor(CurrCell){
+        if(CellHasUnvistedNeighbors(CurrCell) == false){
+            alert("CANT FIND NEIGHBOR WITH ALL VISITED CELLS");
+        }
+        const Neighbors = [];
+        const row = parseInt(CurrCell.attr("data-row"));
+        const col = parseInt(CurrCell.attr("data-col"));
+
+        if(col > 0 && GetCell(row, col - 1).attr("data-explored") === "false"){
+            Neighbors.push(GetCell(row, col - 1));
+        }
+        if(col < NUM_COLS && GetCell(row, col + 1).attr("data-explored") === "false"){
+            Neighbors.push(GetCell(row, col + 1));
+        }
+        if(row > 0 && GetCell(row - 1, col).attr("data-explored") === "false"){
+            Neighbors.push(GetCell(row - 1, col));
+        }
+        if(row < NUM_ROWS && GetCell(row + 1, col).attr("data-explored") === "false"){
+            Neighbors.push(GetCell(row + 1, col));
+        }
+
+        const returnVal = Neighbors[Math.floor(Math.random() * Neighbors.length)];
+        return returnVal;
+    }
+
+}
+
+function GetRow(cell){
+    try{
+        return parseInt(cell.attr("data-row"));
+    }catch(e){
+        debugger;
+    }
+}
+
+function GetCol(cell){
+    try{
+        return parseInt(cell.attr("data-col"));
+    }catch(e){
+        debugger;
+    }
+}
 
 //event handler for clicks of adding the walls
 function AddWallHandler(){
@@ -148,8 +268,8 @@ function AddWallHandler(){
     }
 }
 
-function FindPath(){
-    //starting with : https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+function FindPathDijkstra(){
+    //https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
     if($(".start").length == 0 || $(".end").length == 0){
 
@@ -192,10 +312,10 @@ function FindPath(){
         return;
     }
 
-    NavigateBackwards();
+    NavigateBackwardsDijkstra();
 }
 
-function NavigateBackwards(){
+function NavigateBackwardsDijkstra(){
 
     let CurrCell = $(".end");
 
