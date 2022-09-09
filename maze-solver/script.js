@@ -151,16 +151,12 @@ function AddWallHandler(){
 function FindPath(){
     //starting with : https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
-    // const Cells = [];
+    if($(".start").length == 0 || $(".end").length == 0){
 
-    // $(".cell").each(function (){
-    //     if($(this).hasClass("start")) {
-    //         Cells.push({"elem": $(this), "dist": 0});
-    //         //alert($(this).attr("data-row") + " " + $(this).attr("data-col"))
-    //     }else{
-    //         Cells.push({elem: $(this), dist: 999999});
-    //     }
-    // });
+        alert("Please select a starting and end point!!!");
+
+    }
+
     $(".cell").attr("data-dist", Number.MAX_SAFE_INTEGER);
     $(".cell").attr("data-explored", "false");
 
@@ -188,22 +184,6 @@ function FindPath(){
         //debugger;
 
     }
-
-    // const nextCell = GetNextCell()
-
-    // //alert(nextCell.attr("data-row") + " " + nextCell.attr("data-col"));
-
-    // const distFromStart = parseInt(nextCell.attr("data-dist")) + 1;
-
-    // GetValidNeighbors(nextCell).forEach(function (val){
-    //     if(parseInt(val.attr("data-dist")) > distFromStart){
-    //         val.attr("data-dist", distFromStart.toString());
-    //         val.text(distFromStart.toString());
-    //     }
-    // });
-
-    //alert(Cells[0].elem.attr("data-row") + " " + Cells[0].elem.attr("data-col"))
-
 }
 
 function GetNextCell(){
