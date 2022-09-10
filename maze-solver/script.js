@@ -18,26 +18,26 @@ for(let i = 0; i < NUM_ROWS; i++){
     const row = $('<div></div>').addClass("row");
     $grid.append(row);
     for(let j = 0; j < NUM_COLS; j++){
-        const cell = $('<div></div>').addClass("cell").width(CELL_WIDTH).height(CELL_HEIGHT).attr("data-row", i).attr("data-col", j);
+        const cell = $('<div></div>').addClass("cell").addClass("p-0").width(CELL_WIDTH).height(CELL_HEIGHT).attr("data-row", i).attr("data-col", j);
         row.append(cell);
         const controls = $("<div></div>").addClass('controls');
         //we use height for both width and hight so they stay clean circles
         //north
         controls.append($("<div></div>").height(cell.height() * .2).width(cell.height() * .2)
-            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .1))
-            .addClass("controlsNS").attr("data-side", "N").on('click', AddWallHandler));
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .1)).css("left", "40%")
+            .addClass("control").attr("data-side", "N").on('click', AddWallHandler));
         //south
         controls.append($("<div></div>").height(cell.height() * .2).width(cell.height() * .2)
-            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .7))
-            .addClass("controlsNS").attr("data-side", "S").on('click', AddWallHandler));
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .7)).css("left", "40%")
+            .addClass("control").attr("data-side", "S").on('click', AddWallHandler));
         //east
         controls.append($("<div></div>").height(cell.height() * .2).width(cell.height() * .2)
-            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4))
-            .addClass("controlsE").attr("data-side", "E").on('click', AddWallHandler));
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4)).css("left", "70%")
+            .addClass("control").attr("data-side", "E").on('click', AddWallHandler));
         //west
         controls.append($("<div></div>").height(cell.height() * .2).width(cell.height() * .2)
-            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4))
-            .addClass("controlsW").attr("data-side", "W").on('click', AddWallHandler));
+            .css('background-color', "#000000").css("border-radius", "50%").css("top", (CELL_HEIGHT * .4)).css("left", "10%")
+            .addClass("control").attr("data-side", "W").on('click', AddWallHandler));
 
         controls.css("display", "none");
         cell.append(controls);
@@ -45,9 +45,12 @@ for(let i = 0; i < NUM_ROWS; i++){
 }
 
 $(".cell").on('mouseenter', function() {
+    if(selectingEnd || selectingStart){
+        return;
+    }
 
     const $this = $(this);
-    $this.children(".controls").css("display", "flex");
+    $this.children(".controls").css("display", "block");
 
 });
 
@@ -72,6 +75,8 @@ $(".cell").on('click', function () {
         $this.addClass("start");
 
         selectingStart = false;
+        $("#setstart").addClass("btn-success").removeClass("btn-outline-success");
+
         return;
     }
 
@@ -85,6 +90,8 @@ $(".cell").on('click', function () {
         $this.addClass("end");
 
         selectingEnd = false;
+        $("#setend").addClass("btn-danger").removeClass("btn-outline-danger");
+
         return;
     }
 });
@@ -93,6 +100,7 @@ $("#setstart").on('click', function () {
     if(selectingEnd){
         return;
     }
+    $(this).removeClass("btn-success").addClass("btn-outline-success");
 
     selectingStart = true;
 });
@@ -101,11 +109,18 @@ $("#setend").on('click', function () {
     if(selectingStart){
         return;
     }
+    $(this).removeClass("btn-danger").addClass("btn-outline-danger");
+
     selectingEnd = true;
 });
 
 $("#findpath").on('click', function () {
+    $(".path").removeClass("path");
     FindPathDijkstra();
+});
+
+$("#reset").on('click', function () {
+    location.reload();
 });
 
 $("#genmaze").on('click', function () {
@@ -301,9 +316,8 @@ function FindPathDijkstra(){
     //https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
     if($(".start").length == 0 || $(".end").length == 0){
-
         alert("Please select a starting and end point!!!");
-
+        return;
     }
 
     $(".cell").attr("data-dist", Number.MAX_SAFE_INTEGER);
@@ -328,7 +342,7 @@ function FindPathDijkstra(){
                 elem.attr("data-dist", distFromStart.toString());
                 elem.attr("data-pathtostart-col", CurrCell.attr("data-col"));
                 elem.attr("data-pathtostart-row", CurrCell.attr("data-row"));
-                elem.text(distFromStart.toString());
+                //elem.html(distFromStart.toString());
             }
         });
     }
@@ -346,7 +360,10 @@ function NavigateBackwardsDijkstra(){
     let CurrCell = $(".end");
 
     while(CurrCell.hasClass("start") != true){
-        CurrCell.css("background-color", "blue");
+        if(CurrCell.hasClass("end") == false){
+            CurrCell.addClass("path");
+        }
+        
         CurrCell = GetCell(CurrCell.attr("data-pathtostart-row"), CurrCell.attr("data-pathtostart-col"));
     }
 
