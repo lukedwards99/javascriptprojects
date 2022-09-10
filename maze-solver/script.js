@@ -116,7 +116,15 @@ $("#setend").on('click', function () {
 
 $("#findpath").on('click', function () {
     $(".path").removeClass("path");
-    FindPathDijkstra();
+    $(".cell").removeAttr("data-pathtostart-col").removeAttr("data-pathtostart-row").removeAttr("data-dist");
+
+    switch(parseInt($("#SearchAlgoSelect").val())){
+        case 1: FindPathDijkstra(); break;
+        case 2: FindPathBFS(); break;
+        case 3: alert("Not Implemented."); break;
+        case 4: alert("Not Implemented."); break;
+        default: alert($("#SearchAlgoSelect").val()); return;
+    }
 });
 
 $("#reset").on('click', function () {
@@ -124,19 +132,92 @@ $("#reset").on('click', function () {
 });
 
 $("#genmaze").on('click', function () {
-    GenMazeDepthFirst();
+
+    switch($("#MazeGenAlgo").val().toString()){
+        case "1": GenMazeDepthFirst(); break;
+        case "2": alert("Not Implemented."); break;
+        case "3": alert("Not Implemented."); break;
+    }
 });
+
+function SetAllUnexplored(){
+    $(".cell").attr("data-explored", "false");
+}
+
+function FindPathBFS(){
+    //SetAllWalls();
+    if($(".start").length == 0 || $(".end").length == 0){
+        alert("Please select a starting and end point!!!");
+        return;
+    }
+
+    SetAllUnexplored();
+
+    const queue = [];
+
+    const StartCell = $(".start");
+    SetExplored(StartCell);
+
+    queue.push(StartCell);
+    debugger;
+
+    while(queue.length > 0){
+
+        const CurrCell = queue.shift();
+        SetExplored(CurrCell);
+
+        if(CurrCell.hasClass("end")){
+            NavigateBack();
+            return;
+        }
+
+        $(".exploring").removeClass("exploring");
+        CurrCell.addClass("exploring");
+        debugger;
+
+        const Neighbors = GetValidNeighbors(CurrCell);
+        Neighbors.forEach(function (neihbor){
+            SetExplored(neihbor);
+            neihbor.attr("data-pathtostart-col", CurrCell.attr("data-col"));
+            neihbor.attr("data-pathtostart-row", CurrCell.attr("data-row"));
+            queue.push(neihbor);
+            //debugger;
+        });
+    }
+
+    alert("NO VALID PATH");
+}
+
+function NavigateBack(){
+    let CurrCell = $(".end");
+    
+    while(CurrCell.hasClass("start") != true){
+        if(CurrCell.hasClass("end") == false){
+            CurrCell.addClass("path");
+        }
+        
+        CurrCell = GetCell(CurrCell.attr("data-pathtostart-row"), CurrCell.attr("data-pathtostart-col"));
+    }
+}
+
+function SetExplored(cell){
+    cell.attr("data-explored", "true");
+}
+
+function SetAllWalls(){
+    $(".cell").attr("data-nwall", "true").css("border-top-color", "#000000")
+                .attr("data-swall", "true").css("border-bottom-color", "#000000")
+                .attr("data-ewall", "true").css("border-right-color", "#000000")
+                .attr("data-wwall", "true").css("border-left-color", "#000000")
+                .attr("data-explored", "false");
+}
 
 function GenMazeDepthFirst(){
 
     //using https://en.wikipedia.org/wiki/Maze_generation_algorithm
 
     //reset maze
-    $(".cell").attr("data-nwall", "true").css("border-top-color", "#000000")
-                .attr("data-swall", "true").css("border-bottom-color", "#000000")
-                .attr("data-ewall", "true").css("border-right-color", "#000000")
-                .attr("data-wwall", "true").css("border-left-color", "#000000")
-                .attr("data-explored", "false");
+    SetAllWalls();
     
     const Stack = [];
 
@@ -353,45 +434,34 @@ function FindPathDijkstra(){
     }
 
     NavigateBackwardsDijkstra();
-}
 
-function NavigateBackwardsDijkstra(){
+    function NavigateBackwardsDijkstra(){
 
-    let CurrCell = $(".end");
-
-    while(CurrCell.hasClass("start") != true){
-        if(CurrCell.hasClass("end") == false){
-            CurrCell.addClass("path");
+        let CurrCell = $(".end");
+    
+        while(CurrCell.hasClass("start") != true){
+            if(CurrCell.hasClass("end") == false){
+                CurrCell.addClass("path");
+            }
+            
+            CurrCell = GetCell(CurrCell.attr("data-pathtostart-row"), CurrCell.attr("data-pathtostart-col"));
         }
-        
-        CurrCell = GetCell(CurrCell.attr("data-pathtostart-row"), CurrCell.attr("data-pathtostart-col"));
+    
     }
 
-}
-
-function GetNextCell(){
-    let returnCell = null;
-    let minDist = Number.MAX_SAFE_INTEGER;
-
-    $('.cell').each(function () {
-        if(parseInt($(this).attr("data-dist")) < minDist && $(this).attr("data-explored") === "false"){
-            returnCell = $(this);
-            minDist = parseInt(returnCell.attr("data-dist"));
-        }
-    });
-
-    return returnCell;
-}
-
-function IsUnexploredCells(){
-
-    $('.cell').each(function () {
-        if($(this).attr("data-explored") === "false"){
-            return false;
-        }
-    });
+    function GetNextCell(){
+        let returnCell = null;
+        let minDist = Number.MAX_SAFE_INTEGER;
     
-    return true;
+        $('.cell').each(function () {
+            if(parseInt($(this).attr("data-dist")) < minDist && $(this).attr("data-explored") === "false"){
+                returnCell = $(this);
+                minDist = parseInt(returnCell.attr("data-dist"));
+            }
+        });
+    
+        return returnCell;
+    }
 }
 
 function GetValidNeighbors(CurrCell) {
@@ -411,6 +481,7 @@ function GetValidNeighbors(CurrCell) {
     if(row < NUM_ROWS && CurrCell.attr("data-swall") != "true"){
         Neighbors.push(GetCell(row + 1, col));
     }
+    
     //debugger;
     Neighbors.filter(function (elem) { //remove explored elements
         //debugger;
@@ -424,6 +495,12 @@ function GetValidNeighbors(CurrCell) {
 
 
 function GetCell(row, col){
+    if(col === null){
+        col = Math.floor(Math.random() * NUM_COLS);
+    }
+    if(row === null){
+        row = Math.floor(Math.random() * NUM_ROWS);
+    }
 
     return $('.cell[data-row="' + row + '"][data-col="' + col + '"]')
 }
