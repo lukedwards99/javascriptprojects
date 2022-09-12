@@ -159,7 +159,7 @@ function FindPathBFS(){
     SetExplored(StartCell);
 
     queue.push(StartCell);
-    debugger;
+    //debugger;
 
     while(queue.length > 0){
 
@@ -171,9 +171,9 @@ function FindPathBFS(){
             return;
         }
 
-        $(".exploring").removeClass("exploring");
-        CurrCell.addClass("exploring");
-        debugger;
+        // $(".exploring").removeClass("exploring");
+        // CurrCell.addClass("exploring");
+        // debugger;
 
         const Neighbors = GetValidNeighbors(CurrCell);
         Neighbors.forEach(function (neihbor){
@@ -482,15 +482,27 @@ function GetValidNeighbors(CurrCell) {
         Neighbors.push(GetCell(row + 1, col));
     }
     
-    //debugger;
-    Neighbors.filter(function (elem) { //remove explored elements
-        //debugger;
-        if(elem.attr("data-explored") === "true"){
-            return false;
-        }
-    });
+    //not sure why this didnt work
+    // Neighbors.filter(function (elem) { //remove explored elements
+    //     //debugger;
+    //     if(elem.attr("data-explored") == "true"){
+    //         alert(elem.attr("data-explored"));
+    //         debugger;
+    //         return false;
+    //     }
+    //     return true;
+    // });
 
-    return Neighbors;
+
+    //filter out explored elements
+    const _Neighbors = []
+    Neighbors.forEach(function (elem) {
+        if(elem.attr("data-explored") != "true"){
+            _Neighbors.push(elem);
+        }
+    })
+
+    return _Neighbors;
 }
 
 
