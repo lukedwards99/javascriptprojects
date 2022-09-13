@@ -323,7 +323,7 @@ function GenMazeDepthFirst(horizontalBias){
                 }
             });
 
-            if(_newReturnVal.length != 0 && Math.random() < 1/NUM_COLS){ //one in num col chance that it will still allow another row. 
+            if(_newReturnVal.length != 0 && Math.random() < .75){ //one in num col chance that it will still allow another row. 
                 returnVal = _newReturnVal[Math.floor(Math.random() * _newReturnVal.length)];
             }else{
                 returnVal = Neighbors[Math.floor(Math.random() * Neighbors.length)];
