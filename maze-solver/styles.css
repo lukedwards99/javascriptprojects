@@ -35,3 +35,7 @@
 .path {
     background-color: #1c58ff;
 }
+
+.selected {
+    background-color: #fffb1c;
+}

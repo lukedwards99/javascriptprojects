@@ -225,8 +225,16 @@ function GenMazeDepthFirst(horizontalBias){
     StartCell.attr("data-explored", "true");
     Stack.push(StartCell);// starting cell
 
-    while(Stack.length > 0){
+    const GeneratingMaze = setInterval(function (){
+        if(Stack.length <= 0){
+            clearInterval(GeneratingMaze);
+            $(".selected").removeClass("selected");
+            return;
+        }
+
         const CurrCell = Stack.pop();
+        $(".selected").removeClass("selected");
+        CurrCell.addClass("selected");
 
         if(CellHasUnvistedNeighbors(CurrCell)){
             Stack.push(CurrCell);
@@ -235,7 +243,8 @@ function GenMazeDepthFirst(horizontalBias){
             NextCell.attr("data-explored", "true");
             Stack.push(NextCell);
         }
-    }
+
+    }, 50);
 
     function RemoveWall(alpha, beta){ //DOES NOT CHECK IF CELLS ARE NEIGHBORS
 
