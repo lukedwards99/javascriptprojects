@@ -135,7 +135,7 @@ $("#genmaze").on('click', function () {
 
     switch($("#MazeGenAlgo").val().toString()){
         case "1": GenMazeDepthFirst(); break;
-        case "2": alert("Not Implemented."); break;
+        case "2": GenMazeDepthFirst(true); break;
         case "3": alert("Not Implemented."); break;
     }
 });
@@ -212,7 +212,7 @@ function SetAllWalls(){
                 .attr("data-explored", "false");
 }
 
-function GenMazeDepthFirst(){
+function GenMazeDepthFirst(horizontalBias){
 
     //using https://en.wikipedia.org/wiki/Maze_generation_algorithm
 
@@ -302,7 +302,28 @@ function GenMazeDepthFirst(){
             Neighbors.push(GetCell(row + 1, col));
         }
 
-        const returnVal = Neighbors[Math.floor(Math.random() * Neighbors.length)];
+        let returnVal;// = Neighbors[Math.floor(Math.random() * Neighbors.length)];
+
+        if(horizontalBias === true){
+            const _newReturnVal = []
+
+            Neighbors.forEach(function (elem) {
+                //debugger;
+                if(GetRow(elem) == GetRow(CurrCell)){
+                    _newReturnVal.push(elem);
+                }
+            });
+
+            if(_newReturnVal.length != 0 && Math.random() < 1/NUM_COLS){ //one in num col chance that it will still allow another row. 
+                returnVal = _newReturnVal[Math.floor(Math.random() * _newReturnVal.length)];
+            }else{
+                returnVal = Neighbors[Math.floor(Math.random() * Neighbors.length)];
+            }
+
+        }else{
+            returnVal = Neighbors[Math.floor(Math.random() * Neighbors.length)];
+        }
+
         return returnVal;
     }
 
@@ -312,6 +333,7 @@ function GetRow(cell){
     try{
         return parseInt(cell.attr("data-row"));
     }catch(e){
+        console.error(e.toString());
         debugger;
     }
 }
@@ -320,6 +342,7 @@ function GetCol(cell){
     try{
         return parseInt(cell.attr("data-col"));
     }catch(e){
+        console.error(e.toString());
         debugger;
     }
 }
