@@ -1,0 +1,13 @@
+#main-form {
+
+    height: 200px;
+
+}
+
+@media(min-width: 800px){
+    #main-container {
+
+        max-width: 700px;
+
+    }
+}
