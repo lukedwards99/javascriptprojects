@@ -1,0 +1,38 @@
+- draw player and player movement
+
+- draw terrain
+
+- terrain editor
+
+- draw and move enemies
+
+- attack enemies
+
+- enemy AI
+
+- health
+
+- HUD
+
+- structures
+
+- items
+
+- weapons
+
+CONCEPTS:
+
+open world split into chunks. every chunk is a room in a labyrinth 
+
+use maze algorithm already written to generate the maze
+
+the closer to the exit the more difficult the rooms are
+
+I can ignore the walls of the room and drawing the room with preset room
+drawings
+
+tiles placed in room are off grid and can move however they need
+
+all objects in the room (other than the room itself) are intractable and destroyable
+
+player can craft new items using what they collect to give them buffs
